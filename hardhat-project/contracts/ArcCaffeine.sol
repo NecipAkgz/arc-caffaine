@@ -35,8 +35,9 @@ contract ArcCaffeine {
     /**
      * @dev Register a unique username for the caller.
      * @param _username The desired username.
+     * @param _bio The optional bio.
      */
-    function registerUser(string memory _username) public {
+    function registerUser(string memory _username, string memory _bio) public {
         require(bytes(_username).length > 0, "Username cannot be empty");
         require(addresses[_username] == address(0), "Username already taken");
         require(
@@ -46,6 +47,11 @@ contract ArcCaffeine {
 
         usernames[msg.sender] = _username;
         addresses[_username] = msg.sender;
+
+        if (bytes(_bio).length > 0) {
+            bios[msg.sender] = _bio;
+            emit BioUpdated(msg.sender, _bio);
+        }
 
         emit UserRegistered(msg.sender, _username);
     }

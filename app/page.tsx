@@ -13,13 +13,14 @@ export default function Home() {
   const { isConnected } = useAccount()
   const { isRegistered, register, loading, username } = useArcCaffeine()
   const [newUsername, setNewUsername] = useState('')
+  const [bio, setBio] = useState('')
   const router = useRouter()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newUsername) return
     try {
-      await register(newUsername)
+      await register(newUsername, bio)
       router.push('/dashboard')
     } catch (e) {
       toast.error("Registration failed. Check console.")
@@ -113,6 +114,16 @@ export default function Home() {
                   onChange={(e) => setNewUsername(e.target.value)}
                   className="bg-background border border-input rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
                   required
+                />
+              </div>
+              <div className="flex flex-col gap-2 text-left">
+                <label htmlFor="bio" className="text-sm font-medium text-muted-foreground">Bio (Optional)</label>
+                <textarea
+                  id="bio"
+                  placeholder="Tell us about yourself..."
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="bg-background border border-input rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition resize-none h-24"
                 />
               </div>
               <button

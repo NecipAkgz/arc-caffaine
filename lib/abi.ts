@@ -273,6 +273,11 @@ export const ARC_CAFFEINE_ABI = [
         "internalType": "string",
         "name": "_username",
         "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_bio",
+        "type": "string"
       }
     ],
     "name": "registerUser",
@@ -321,4 +326,4 @@ export const ARC_CAFFEINE_ABI = [
   }
 ] as const;
 
-export const CONTRACT_ADDRESS = "0x22790E2a663E08BCC4D9863AB01bA5D848e61532";
+export const CONTRACT_ADDRESS = "0xfbfB9b30e4df14ec6fEf799d2f60A867f130D1a0";

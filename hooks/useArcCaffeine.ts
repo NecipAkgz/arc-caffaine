@@ -13,11 +13,13 @@ export function useArcCaffeine() {
   const [username, setUsername] = useState<string | null>(null)
   const [isRegistered, setIsRegistered] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [checkingRegistration, setCheckingRegistration] = useState(true)
 
   const checkRegistration = useCallback(async () => {
     if (!address || !publicClient) {
         setIsRegistered(false)
         setUsername(null)
+        setCheckingRegistration(false)
         return
     }
     try {
@@ -37,6 +39,8 @@ export function useArcCaffeine() {
     } catch (error) {
       console.error("Error checking registration", error)
       // In case of error (e.g. contract not deployed on placeholder address), we might want to handle it gracefully
+    } finally {
+      setCheckingRegistration(false)
     }
   }, [address, publicClient])
 
@@ -50,7 +54,7 @@ export function useArcCaffeine() {
     }
   }, [chainId, switchChainAsync])
 
-  const register = useCallback(async (newUsername: string) => {
+  const register = useCallback(async (newUsername: string, bio: string = '') => {
     if (!walletClient || !address) return
     setLoading(true)
     try {
@@ -59,7 +63,7 @@ export function useArcCaffeine() {
         address: CONTRACT_ADDRESS,
         abi: ARC_CAFFEINE_ABI,
         functionName: 'registerUser',
-        args: [newUsername],
+        args: [newUsername, bio],
         account: address,
         chain: arcTestnet
       })
@@ -152,6 +156,7 @@ export function useArcCaffeine() {
   return {
     username,
     isRegistered,
+    checkingRegistration,
     loading,
     register,
     buyCoffee,

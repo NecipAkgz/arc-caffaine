@@ -7,13 +7,15 @@ import { formatEther } from 'viem'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
 import { Loader2, Copy, ExternalLink, DollarSign, History, Coffee, User } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export default function Dashboard() {
   const { address } = useAccount()
   const publicClient = usePublicClient()
-  const { username, withdraw, updateBio, loading: actionLoading, getBalance } = useArcCaffeine()
+  const { username, withdraw, updateBio, loading: actionLoading, getBalance, isRegistered, checkingRegistration } = useArcCaffeine()
+  const router = useRouter()
   const [balance, setBalance] = useState<string>('0')
   const [memos, setMemos] = useState<any[]>([])
   const [bio, setBio] = useState('')
@@ -22,7 +24,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!address || !publicClient) return
+      if (!address || !publicClient) {
+          setLoading(false)
+          return
+      }
       try {
         const bal = await getBalance()
         setBalance(formatEther(bal))
@@ -95,12 +100,19 @@ export default function Dashboard() {
     }
   }
 
-  if (!address) {
-      return <div className="p-8 text-center">Please connect your wallet.</div>
+
+  useEffect(() => {
+      if (!loading && !checkingRegistration && !isRegistered) {
+          router.push('/')
+      }
+  }, [loading, checkingRegistration, isRegistered, router])
+
+  if (loading || checkingRegistration) {
+      return <div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
   }
 
-  if (loading) {
-      return <div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+  if (!isRegistered) {
+      return null
   }
 
   return (
