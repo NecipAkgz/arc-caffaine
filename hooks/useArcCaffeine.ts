@@ -14,14 +14,18 @@ export function useArcCaffeine() {
   const [isRegistered, setIsRegistered] = useState(false)
   const [loading, setLoading] = useState(false)
   const [checkingRegistration, setCheckingRegistration] = useState(true)
+  const [checkedAddress, setCheckedAddress] = useState<string | null>(null)
 
   const checkRegistration = useCallback(async () => {
-    if (!address || !publicClient) {
+    setCheckingRegistration(true)
+    if (!address) {
         setIsRegistered(false)
         setUsername(null)
         setCheckingRegistration(false)
+        setCheckedAddress(null)
         return
     }
+    if (!publicClient) return // Wait for publicClient
     try {
       const name = await publicClient.readContract({
         address: CONTRACT_ADDRESS,
@@ -41,6 +45,7 @@ export function useArcCaffeine() {
       // In case of error (e.g. contract not deployed on placeholder address), we might want to handle it gracefully
     } finally {
       setCheckingRegistration(false)
+      if (address) setCheckedAddress(address)
     }
   }, [address, publicClient])
 
@@ -157,6 +162,7 @@ export function useArcCaffeine() {
     username,
     isRegistered,
     checkingRegistration,
+    checkedAddress,
     loading,
     register,
     buyCoffee,

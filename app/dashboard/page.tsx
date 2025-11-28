@@ -5,11 +5,12 @@ import { useArcCaffeine } from '@/hooks/useArcCaffeine'
 import { useEffect, useState } from 'react'
 import { formatEther } from 'viem'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
-import { Loader2, Copy, ExternalLink, DollarSign, History, Coffee, User } from 'lucide-react'
+import { Loader2, Copy, ExternalLink, DollarSign, History, Coffee, User, Edit } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import BioModal from '@/components/BioModal'
 
 export default function Dashboard() {
   const { address } = useAccount()
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const [bio, setBio] = useState('')
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [isBioModalOpen, setIsBioModalOpen] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,12 +81,14 @@ export default function Dashboard() {
     }
   }
 
-  const handleSaveBio = async () => {
+  const handleSaveBio = async (newBio: string) => {
     try {
-        await updateBio(bio)
+        await updateBio(newBio)
+        setBio(newBio)
         toast.success("Bio updated successfully!")
     } catch (e) {
         toast.error("Failed to update bio")
+        throw e // Re-throw to let the modal handle the error state if needed
     }
   }
 
@@ -162,23 +166,27 @@ export default function Dashboard() {
         </div>
 
         {/* Profile Settings */}
-        <div className="bg-secondary/30 border border-border rounded-2xl p-6">
-            <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
-                <User className="w-5 h-5" /> Profile Bio
-            </h3>
-            <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell your supporters about yourself..."
-                className="w-full mt-4 p-3 rounded-lg bg-background border border-border resize-none h-24 focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-            <button
-                onClick={handleSaveBio}
-                disabled={actionLoading}
-                className="mt-4 w-full bg-secondary hover:bg-secondary/80 text-foreground px-4 py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-                {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Bio'}
-            </button>
+        <div className="bg-secondary/30 border border-border rounded-2xl p-6 flex flex-col">
+            <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
+                    <User className="w-5 h-5" /> Profile Bio
+                </h3>
+                <button
+                    onClick={() => setIsBioModalOpen(true)}
+                    className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground"
+                    title="Edit Bio"
+                >
+                    <Edit className="w-4 h-4" />
+                </button>
+            </div>
+
+            <div className="flex-1 bg-background/50 rounded-lg p-4 border border-border/50">
+                {bio ? (
+                    <p className="text-sm text-foreground/90 whitespace-pre-wrap">{bio}</p>
+                ) : (
+                    <p className="text-sm text-muted-foreground italic">No bio set yet. Click edit to add one.</p>
+                )}
+            </div>
         </div>
       </div>
 
@@ -207,6 +215,13 @@ export default function Dashboard() {
             )}
         </div>
       </div>
+
+      <BioModal
+        isOpen={isBioModalOpen}
+        onClose={() => setIsBioModalOpen(false)}
+        initialBio={bio}
+        onSave={handleSaveBio}
+      />
     </div>
   )
 }

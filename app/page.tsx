@@ -10,8 +10,8 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 
 export default function Home() {
-  const { isConnected } = useAccount()
-  const { isRegistered, register, loading, username } = useArcCaffeine()
+  const { isConnected, address } = useAccount()
+  const { isRegistered, register, loading, username, checkingRegistration, checkedAddress } = useArcCaffeine()
   const [newUsername, setNewUsername] = useState('')
   const [bio, setBio] = useState('')
   const router = useRouter()
@@ -91,6 +91,11 @@ export default function Home() {
                 );
               }}
             </ConnectButton.Custom>
+          ) : checkingRegistration || (isConnected && (!address || address !== checkedAddress)) ? (
+            <div className="flex flex-col items-center justify-center p-8">
+                <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+                <p className="text-muted-foreground">Checking profile...</p>
+            </div>
           ) : isRegistered ? (
              <div className="space-y-4">
                <p className="text-lg">Welcome back, <span className="font-bold text-primary">@{username}</span>!</p>
