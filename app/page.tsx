@@ -26,7 +26,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 text-center">
+    <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
       <div className="max-w-3xl space-y-8">
         <div className="space-y-4">
           <div className="inline-block p-4 rounded-full bg-primary/10 mb-4 animate-pulse">

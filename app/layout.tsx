@@ -23,7 +23,7 @@ export default function RootLayout({
         <WalletProvider>
           <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 flex flex-col">
               {children}
             </main>
             <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground bg-secondary/30">
