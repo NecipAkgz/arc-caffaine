@@ -82,26 +82,23 @@ export default function Dashboard() {
   }
 
   const handleSaveBio = async (newBio: string) => {
-    try {
-        await updateBio(newBio)
-        setBio(newBio)
-        toast.success("Bio updated successfully!")
-    } catch (e) {
-        toast.error("Failed to update bio")
-        throw e // Re-throw to let the modal handle the error state if needed
-    }
+    // BioModal handles the toast notifications
+    await updateBio(newBio)
+    setBio(newBio)
   }
 
   const handleWithdraw = async () => {
-    try {
-        await withdraw()
+    const promise = withdraw().then(async () => {
         // Refresh balance
         const bal = await getBalance()
         setBalance(formatEther(bal))
-        toast.success("Withdrawal successful!")
-    } catch (e) {
-        toast.error("Withdraw failed")
-    }
+    })
+
+    toast.promise(promise, {
+        loading: 'Withdrawing funds...',
+        success: 'Withdrawal successful! 💸',
+        error: 'Withdraw failed. Please try again.'
+    })
   }
 
 

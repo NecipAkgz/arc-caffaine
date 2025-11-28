@@ -77,14 +77,17 @@ export default function PublicProfile() {
   const handleSupport = async (e: React.FormEvent) => {
       e.preventDefault()
       if (!recipientAddress) return
-      try {
-          await buyCoffee(username, name, message, amount)
-          // Refresh memos
-          toast.success("Coffee bought successfully!")
+
+      const promise = buyCoffee(username, name, message, amount).then(() => {
+          // Refresh page to show new memo
           window.location.reload()
-      } catch (e) {
-          toast.error("Transaction failed")
-      }
+      })
+
+      toast.promise(promise, {
+          loading: 'Brewing coffee... ☕',
+          success: 'Coffee bought successfully! Thank you for your support! 🎉',
+          error: 'Transaction failed. Please try again.'
+      })
   }
 
   if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>

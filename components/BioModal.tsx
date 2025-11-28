@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Loader2, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface BioModalProps {
   isOpen: boolean
@@ -23,9 +24,19 @@ export default function BioModal({ isOpen, onClose, initialBio, onSave }: BioMod
 
   const handleSave = async () => {
     setLoading(true)
+    const promise = onSave(bio)
+
+    toast.promise(promise, {
+      loading: 'Updating your bio...',
+      success: () => {
+        onClose()
+        return 'Bio updated successfully! ☕'
+      },
+      error: 'Failed to update bio. Please try again.',
+    })
+
     try {
-      await onSave(bio)
-      onClose()
+      await promise
     } catch (error) {
       console.error("Failed to save bio", error)
     } finally {
