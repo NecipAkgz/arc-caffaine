@@ -6,6 +6,7 @@ contract ArcCaffeine {
     mapping(address => string) public usernames;
     mapping(string => address) public addresses;
     mapping(address => uint256) public balances;
+    mapping(address => string) public bios;
 
     struct Memo {
         address from;
@@ -27,6 +28,7 @@ contract ArcCaffeine {
         string message
     );
     event Withdrawal(address indexed user, uint256 amount);
+    event BioUpdated(address indexed user, string bio);
 
     // Functions
 
@@ -46,6 +48,16 @@ contract ArcCaffeine {
         addresses[_username] = msg.sender;
 
         emit UserRegistered(msg.sender, _username);
+    }
+
+    /**
+     * @dev Update the user's bio.
+     * @param _bio The new bio text.
+     */
+    function updateBio(string memory _bio) public {
+        require(bytes(usernames[msg.sender]).length > 0, "User not registered");
+        bios[msg.sender] = _bio;
+        emit BioUpdated(msg.sender, _bio);
     }
 
     /**

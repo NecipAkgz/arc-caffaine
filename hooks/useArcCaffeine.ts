@@ -44,13 +44,13 @@ export function useArcCaffeine() {
     checkRegistration()
   }, [checkRegistration])
 
-  const ensureNetwork = async () => {
+  const ensureNetwork = useCallback(async () => {
     if (chainId !== arcTestnet.id) {
         await switchChainAsync({ chainId: arcTestnet.id })
     }
-  }
+  }, [chainId, switchChainAsync])
 
-  const register = async (newUsername: string) => {
+  const register = useCallback(async (newUsername: string) => {
     if (!walletClient || !address) return
     setLoading(true)
     try {
@@ -71,9 +71,9 @@ export function useArcCaffeine() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [walletClient, address, ensureNetwork, publicClient, checkRegistration])
 
-  const buyCoffee = async (recipientUsername: string, name: string, message: string, amount: string) => {
+  const buyCoffee = useCallback(async (recipientUsername: string, name: string, message: string, amount: string) => {
     if (!walletClient || !address) return
     setLoading(true)
     try {
@@ -94,9 +94,9 @@ export function useArcCaffeine() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [walletClient, address, ensureNetwork, publicClient])
 
-  const withdraw = async () => {
+  const withdraw = useCallback(async () => {
     if (!walletClient || !address) return
     setLoading(true)
     try {
@@ -115,9 +115,31 @@ export function useArcCaffeine() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [walletClient, address, ensureNetwork, publicClient])
 
-  const getBalance = async () => {
+  const updateBio = useCallback(async (bio: string) => {
+    if (!walletClient || !address) return
+    setLoading(true)
+    try {
+      await ensureNetwork()
+      const hash = await walletClient.writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: ARC_CAFFEINE_ABI,
+        functionName: 'updateBio',
+        args: [bio],
+        account: address,
+        chain: arcTestnet
+      })
+      await publicClient?.waitForTransactionReceipt({ hash })
+    } catch (error) {
+      console.error("Update Bio failed", error)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }, [walletClient, address, ensureNetwork, publicClient])
+
+  const getBalance = useCallback(async () => {
       if (!address || !publicClient) return BigInt(0)
       return await publicClient.readContract({
         address: CONTRACT_ADDRESS,
@@ -125,7 +147,7 @@ export function useArcCaffeine() {
         functionName: 'balances',
         args: [address]
       })
-  }
+  }, [address, publicClient])
 
   return {
     username,
@@ -134,6 +156,7 @@ export function useArcCaffeine() {
     register,
     buyCoffee,
     withdraw,
+    updateBio,
     getBalance
   }
 }

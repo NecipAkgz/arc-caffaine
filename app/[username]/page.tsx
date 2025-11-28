@@ -21,6 +21,7 @@ export default function PublicProfile() {
 
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [memos, setMemos] = useState<any[]>([])
+  const [bio, setBio] = useState('')
   const [loading, setLoading] = useState(true)
 
   const [name, setName] = useState('')
@@ -44,6 +45,14 @@ export default function PublicProfile() {
 
         if (addr && addr !== '0x0000000000000000000000000000000000000000') {
             setRecipientAddress(addr)
+
+            const bioData = await client.readContract({
+                address: CONTRACT_ADDRESS,
+                abi: ARC_CAFFEINE_ABI,
+                functionName: 'bios',
+                args: [addr]
+            })
+            setBio(bioData || '')
 
             const data = await client.readContract({
                 address: CONTRACT_ADDRESS,
@@ -93,7 +102,7 @@ export default function PublicProfile() {
                     <Coffee className="w-12 h-12 text-primary" />
                 </div>
                 <h1 className="text-3xl font-bold">@{username}</h1>
-                <p className="text-muted-foreground">Creating on Arc Testnet</p>
+                {bio && <p className="text-sm text-foreground/80 mt-2 whitespace-pre-wrap">{bio}</p>}
             </div>
 
             <div className="bg-secondary/50 border border-border rounded-2xl p-8">

@@ -5,7 +5,7 @@ import { useArcCaffeine } from '@/hooks/useArcCaffeine'
 import { useEffect, useState } from 'react'
 import { formatEther } from 'viem'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
-import { Loader2, Copy, ExternalLink, DollarSign, History, Coffee } from 'lucide-react'
+import { Loader2, Copy, ExternalLink, DollarSign, History, Coffee, User } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -13,9 +13,10 @@ import { toast } from 'sonner'
 export default function Dashboard() {
   const { address } = useAccount()
   const publicClient = usePublicClient()
-  const { username, withdraw, loading: actionLoading, getBalance } = useArcCaffeine()
+  const { username, withdraw, updateBio, loading: actionLoading, getBalance } = useArcCaffeine()
   const [balance, setBalance] = useState<string>('0')
   const [memos, setMemos] = useState<any[]>([])
+  const [bio, setBio] = useState('')
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
 
@@ -44,6 +45,25 @@ export default function Dashboard() {
     fetchData()
   }, [address, publicClient, getBalance])
 
+  // Fetch bio separately and only once or when address changes
+  useEffect(() => {
+      const fetchBio = async () => {
+          if (!address || !publicClient) return
+          try {
+            const bioData = await publicClient.readContract({
+                address: CONTRACT_ADDRESS,
+                abi: ARC_CAFFEINE_ABI,
+                functionName: 'bios',
+                args: [address]
+            })
+            setBio(bioData || '')
+          } catch (e) {
+              console.error("Failed to fetch bio", e)
+          }
+      }
+      fetchBio()
+  }, [address, publicClient])
+
   const handleCopy = () => {
     if (username) {
         const url = `${window.location.origin}/${username}`
@@ -51,6 +71,15 @@ export default function Dashboard() {
         toast.success("Link copied!")
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const handleSaveBio = async () => {
+    try {
+        await updateBio(bio)
+        toast.success("Bio updated successfully!")
+    } catch (e) {
+        toast.error("Failed to update bio")
     }
   }
 
@@ -118,6 +147,26 @@ export default function Dashboard() {
             </h3>
             <p className="text-4xl font-bold mt-4">{memos.length}</p>
             <p className="text-sm text-muted-foreground mt-2">Lifetime supporters</p>
+        </div>
+
+        {/* Profile Settings */}
+        <div className="bg-secondary/30 border border-border rounded-2xl p-6">
+            <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
+                <User className="w-5 h-5" /> Profile Bio
+            </h3>
+            <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell your supporters about yourself..."
+                className="w-full mt-4 p-3 rounded-lg bg-background border border-border resize-none h-24 focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+            <button
+                onClick={handleSaveBio}
+                disabled={actionLoading}
+                className="mt-4 w-full bg-secondary hover:bg-secondary/80 text-foreground px-4 py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+                {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Bio'}
+            </button>
         </div>
       </div>
 
