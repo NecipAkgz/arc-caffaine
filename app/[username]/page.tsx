@@ -10,9 +10,13 @@ import { createPublicClient, http } from 'viem'
 import { arcTestnet } from '@/lib/chain'
 import { toast } from 'sonner'
 
+import { useAccount } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+
 export default function PublicProfile() {
   const params = useParams()
   const username = params.username as string
+  const { isConnected } = useAccount()
   const { buyCoffee, loading: actionLoading } = useArcCaffeine()
 
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
@@ -133,13 +137,35 @@ export default function PublicProfile() {
                         className="w-full bg-background border border-input rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary outline-none min-h-[100px]"
                         placeholder="Say something nice..."
                     />
-                    <button
-                        type="submit"
-                        disabled={actionLoading}
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
-                    >
-                        {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Support ${amount} USDC`}
-                    </button>
+
+                    {isConnected ? (
+                        <button
+                            type="submit"
+                            disabled={actionLoading}
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Support ${amount} USDC`}
+                        </button>
+                    ) : (
+                        <ConnectButton.Custom>
+                            {({
+                                openConnectModal,
+                                mounted,
+                            }) => {
+                                const ready = mounted;
+                                return (
+                                    <button
+                                        type="button"
+                                        onClick={openConnectModal}
+                                        disabled={!ready}
+                                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        Connect Wallet to Support
+                                    </button>
+                                );
+                            }}
+                        </ConnectButton.Custom>
+                    )}
                 </form>
             </div>
         </div>
