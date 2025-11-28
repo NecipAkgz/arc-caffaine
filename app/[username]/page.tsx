@@ -215,26 +215,28 @@ export default function PublicProfile() {
         {/* Right: Feed */}
         <div className="space-y-6">
             <h3 className="text-xl font-bold flex items-center gap-2"><MessageSquare className="w-5 h-5" /> Recent Messages</h3>
-            <div className="space-y-4">
-                {memos.length === 0 ? (
-                    <p className="text-muted-foreground italic">No messages yet. Be the first to support!</p>
-                ) : (
-                    memos.map((memo, i) => (
-                        <div
-                            key={`${memo.timestamp}-${memo.from}`}
-                            className={`bg-secondary/20 border border-border rounded-xl p-4 space-y-2 ${i === 0 && newMemoKey > 0 ? 'memo-slide-in' : ''}`}
-                        >
-                            <div className="flex justify-between items-start">
-                                <span className="font-bold text-primary">{memo.name || 'Anonymous'}</span>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
-                                    <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
+            <div className={`scroll-container ${memos.length > 4 ? 'has-scroll' : ''}`}>
+                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                    {memos.length === 0 ? (
+                        <p className="text-muted-foreground italic">No messages yet. Be the first to support!</p>
+                    ) : (
+                        memos.map((memo, i) => (
+                            <div
+                                key={`${memo.timestamp}-${memo.from}`}
+                                className={`bg-secondary/20 border border-border rounded-xl p-4 space-y-2 ${i === 0 && newMemoKey > 0 ? 'memo-slide-in' : ''}`}
+                            >
+                                <div className="flex justify-between items-start">
+                                    <span className="font-bold text-primary">{memo.name || 'Anonymous'}</span>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
+                                        <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
+                                    </div>
                                 </div>
+                                <p className="text-sm">{memo.message}</p>
                             </div>
-                            <p className="text-sm">{memo.message}</p>
-                        </div>
-                    ))
-                )}
+                        ))
+                    )}
+                </div>
             </div>
         </div>
     </div>

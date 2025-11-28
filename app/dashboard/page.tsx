@@ -190,29 +190,31 @@ export default function Dashboard() {
       {/* History */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold flex items-center gap-2"><History className="w-6 h-6" /> Recent Support</h2>
-        <div className="grid gap-4">
-            {memos.length === 0 ? (
-                <p className="text-muted-foreground">No coffees received yet. Share your link!</p>
-            ) : (
-                memos.map((memo, i) => (
-                    <div key={i} className="bg-secondary/20 border border-border rounded-xl p-4 flex gap-4 items-start">
-                        <div className="bg-primary/10 p-3 rounded-full">
-                            <Coffee className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                            <div className="flex justify-between items-start">
-                                <h4 className="font-bold">{memo.name || 'Anonymous'}</h4>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
-                                    <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
-                                </div>
+        <div className={`scroll-container ${memos.length > 3 ? 'has-scroll' : ''}`}>
+            <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
+                {memos.length === 0 ? (
+                    <p className="text-muted-foreground">No coffees received yet. Share your link!</p>
+                ) : (
+                    memos.map((memo, i) => (
+                        <div key={i} className="bg-secondary/20 border border-border rounded-xl p-4 flex gap-4 items-start">
+                            <div className="bg-primary/10 p-3 rounded-full">
+                                <Coffee className="w-5 h-5 text-primary" />
                             </div>
-                            <p className="text-sm text-muted-foreground mt-1">{memo.message}</p>
-                            <p className="text-xs text-muted-foreground mt-2 font-mono">From: {memo.from.slice(0,6)}...{memo.from.slice(-4)}</p>
+                            <div className="flex-1">
+                                <div className="flex justify-between items-start">
+                                    <h4 className="font-bold">{memo.name || 'Anonymous'}</h4>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
+                                        <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-1">{memo.message}</p>
+                                <p className="text-xs text-muted-foreground mt-2 font-mono">From: {memo.from.slice(0,6)}...{memo.from.slice(-4)}</p>
+                            </div>
                         </div>
-                    </div>
-                ))
-            )}
+                    ))
+                )}
+            </div>
         </div>
       </div>
 
