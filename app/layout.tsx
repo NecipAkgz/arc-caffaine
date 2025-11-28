@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import "@rainbow-me/rainbowkit/styles.css";
 import "./globals.css";
-import { WalletProvider } from "@/components/WalletProvider";
+import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
 import { Toaster } from "sonner";
 
@@ -20,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
-        <WalletProvider>
+        <Providers>
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <main className="flex-1 flex flex-col">
@@ -31,7 +32,7 @@ export default function RootLayout({
             </footer>
           </div>
           <Toaster position="bottom-right" theme="dark" />
-        </WalletProvider>
+        </Providers>
       </body>
     </html>
   );

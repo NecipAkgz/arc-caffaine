@@ -1,11 +1,15 @@
-import { useWallet } from '@/components/WalletProvider'
+import { useAccount, usePublicClient, useWalletClient, useSwitchChain } from 'wagmi'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
 import { useState, useEffect, useCallback } from 'react'
 import { parseEther } from 'viem'
 import { arcTestnet } from '@/lib/chain'
 
 export function useArcCaffeine() {
-  const { address, publicClient, walletClient, chainId, switchNetwork } = useWallet()
+  const { address, chainId } = useAccount()
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const { switchChainAsync } = useSwitchChain()
+
   const [username, setUsername] = useState<string | null>(null)
   const [isRegistered, setIsRegistered] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -40,13 +44,17 @@ export function useArcCaffeine() {
     checkRegistration()
   }, [checkRegistration])
 
+  const ensureNetwork = async () => {
+    if (chainId !== arcTestnet.id) {
+        await switchChainAsync({ chainId: arcTestnet.id })
+    }
+  }
+
   const register = async (newUsername: string) => {
     if (!walletClient || !address) return
     setLoading(true)
     try {
-      if (chainId !== arcTestnet.id) {
-          await switchNetwork()
-      }
+      await ensureNetwork()
       const hash = await walletClient.writeContract({
         address: CONTRACT_ADDRESS,
         abi: ARC_CAFFEINE_ABI,
@@ -69,9 +77,7 @@ export function useArcCaffeine() {
     if (!walletClient || !address) return
     setLoading(true)
     try {
-      if (chainId !== arcTestnet.id) {
-          await switchNetwork()
-      }
+      await ensureNetwork()
       const hash = await walletClient.writeContract({
         address: CONTRACT_ADDRESS,
         abi: ARC_CAFFEINE_ABI,
@@ -94,9 +100,7 @@ export function useArcCaffeine() {
     if (!walletClient || !address) return
     setLoading(true)
     try {
-      if (chainId !== arcTestnet.id) {
-          await switchNetwork()
-      }
+      await ensureNetwork()
       const hash = await walletClient.writeContract({
         address: CONTRACT_ADDRESS,
         abi: ARC_CAFFEINE_ABI,

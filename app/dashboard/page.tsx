@@ -1,6 +1,6 @@
 'use client'
 
-import { useWallet } from '@/components/WalletProvider'
+import { useAccount, usePublicClient } from 'wagmi'
 import { useArcCaffeine } from '@/hooks/useArcCaffeine'
 import { useEffect, useState } from 'react'
 import { formatEther } from 'viem'
@@ -11,7 +11,8 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export default function Dashboard() {
-  const { address, publicClient } = useWallet()
+  const { address } = useAccount()
+  const publicClient = usePublicClient()
   const { username, withdraw, loading: actionLoading, getBalance } = useArcCaffeine()
   const [balance, setBalance] = useState<string>('0')
   const [memos, setMemos] = useState<any[]>([])

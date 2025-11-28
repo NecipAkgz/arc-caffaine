@@ -1,6 +1,7 @@
 'use client'
 
-import { useWallet } from '@/components/WalletProvider'
+import { useAccount } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useArcCaffeine } from '@/hooks/useArcCaffeine'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -9,7 +10,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 
 export default function Home() {
-  const { isConnected, connect } = useWallet()
+  const { isConnected } = useAccount()
   const { isRegistered, register, loading, username } = useArcCaffeine()
   const [newUsername, setNewUsername] = useState('')
   const router = useRouter()
@@ -43,12 +44,52 @@ export default function Home() {
 
         <div className="flex flex-col items-center gap-4">
           {!isConnected ? (
-            <button
-              onClick={connect}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full text-lg font-bold transition shadow-lg hover:shadow-primary/25 flex items-center gap-2"
-            >
-              Connect Wallet <ArrowRight className="w-5 h-5" />
-            </button>
+            <ConnectButton.Custom>
+              {({
+                account,
+                chain,
+                openAccountModal,
+                openChainModal,
+                openConnectModal,
+                authenticationStatus,
+                mounted,
+              }) => {
+                const ready = mounted && authenticationStatus !== 'loading';
+                const connected =
+                  ready &&
+                  account &&
+                  chain &&
+                  (!authenticationStatus ||
+                    authenticationStatus === 'authenticated');
+
+                return (
+                  <div
+                    {...(!ready && {
+                      'aria-hidden': true,
+                      'style': {
+                        opacity: 0,
+                        pointerEvents: 'none',
+                        userSelect: 'none',
+                      },
+                    })}
+                  >
+                    {(() => {
+                      if (!connected) {
+                        return (
+                          <button
+                            onClick={openConnectModal}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full text-lg font-bold transition shadow-lg hover:shadow-primary/25 flex items-center gap-2"
+                          >
+                            Connect Wallet <ArrowRight className="w-5 h-5" />
+                          </button>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                );
+              }}
+            </ConnectButton.Custom>
           ) : isRegistered ? (
              <div className="space-y-4">
                <p className="text-lg">Welcome back, <span className="font-bold text-primary">@{username}</span>!</p>

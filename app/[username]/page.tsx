@@ -1,6 +1,6 @@
 'use client'
 
-import { useWallet } from '@/components/WalletProvider'
+
 import { useArcCaffeine } from '@/hooks/useArcCaffeine'
 import { useEffect, useState } from 'react'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
