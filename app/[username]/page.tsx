@@ -226,13 +226,13 @@ export default function PublicProfile() {
                                 className={`bg-secondary/20 border border-border rounded-xl p-4 space-y-2 ${i === 0 && newMemoKey > 0 ? 'memo-slide-in' : ''}`}
                             >
                                 <div className="flex justify-between items-start">
-                                    <span className="font-bold text-primary">{memo.name || 'Anonymous'}</span>
+                                    <span className="font-bold text-primary">{memo.name?.trim() || 'Anonymous'}</span>
                                     <div className="flex flex-col items-end">
                                         <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
                                         <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
                                     </div>
                                 </div>
-                                <p className="text-sm">{memo.message}</p>
+                                <p className="text-sm">{memo.message?.trim() || 'No message'}</p>
                             </div>
                         ))
                     )}
