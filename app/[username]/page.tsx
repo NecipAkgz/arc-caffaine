@@ -19,7 +19,7 @@ export default function PublicProfile() {
   const { isConnected } = useAccount()
   const { buyCoffee, loading: actionLoading } = useArcCaffeine()
 
-  const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
+  const [recipientAddress, setRecipientAddress] = useState<`0x${string}` | null>(null)
   const [memos, setMemos] = useState<any[]>([])
   const [bio, setBio] = useState('')
   const [loading, setLoading] = useState(true)
@@ -27,6 +27,7 @@ export default function PublicProfile() {
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [amount, setAmount] = useState('5') // Default 5 USDC
+  const [newMemoKey, setNewMemoKey] = useState(0) // For triggering animation
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,10 +79,39 @@ export default function PublicProfile() {
       e.preventDefault()
       if (!recipientAddress) return
 
-      const promise = buyCoffee(username, name, message, amount).then(() => {
-          // Refresh page to show new memo
-          window.location.reload()
-      })
+      const promise = buyCoffee(username, name, message, amount)
+          .then(async () => {
+              // Transaction confirmed! Now fetch fresh data
+              const client = createPublicClient({
+                  chain: arcTestnet,
+                  transport: http()
+              })
+
+              // Wait a bit for blockchain to update
+              await new Promise(resolve => setTimeout(resolve, 1500))
+
+              const data = await client.readContract({
+                  address: CONTRACT_ADDRESS,
+                  abi: ARC_CAFFEINE_ABI,
+                  functionName: 'getMemos',
+                  args: [recipientAddress]
+              })
+              const sorted = [...data].sort((a: any, b: any) => Number(b.timestamp) - Number(a.timestamp))
+
+              // Trigger animation by incrementing key
+              setNewMemoKey(prev => prev + 1)
+              setMemos(sorted)
+
+              // Clear form
+              setName('')
+              setMessage('')
+              setAmount('5')
+          })
+          .catch((error) => {
+              // Error handling - don't update UI if transaction failed
+              console.error('Transaction failed:', error)
+              throw error // Re-throw to let toast handle it
+          })
 
       toast.promise(promise, {
           loading: 'Brewing coffee... ☕',
@@ -190,11 +220,14 @@ export default function PublicProfile() {
                     <p className="text-muted-foreground italic">No messages yet. Be the first to support!</p>
                 ) : (
                     memos.map((memo, i) => (
-                        <div key={i} className="bg-secondary/20 border border-border rounded-xl p-4 space-y-2">
+                        <div
+                            key={`${memo.timestamp}-${memo.from}`}
+                            className={`bg-secondary/20 border border-border rounded-xl p-4 space-y-2 ${i === 0 && newMemoKey > 0 ? 'memo-slide-in' : ''}`}
+                        >
                             <div className="flex justify-between items-start">
                                 <span className="font-bold text-primary">{memo.name || 'Anonymous'}</span>
                                 <div className="flex flex-col items-end">
-                                    <span className="text-sm font-bold text-primary">+{formatEther(memo.amount)} USDC</span>
+                                    <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
                                     <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
                                 </div>
                             </div>

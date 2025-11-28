@@ -203,7 +203,7 @@ export default function Dashboard() {
                             <div className="flex justify-between items-start">
                                 <h4 className="font-bold">{memo.name || 'Anonymous'}</h4>
                                 <div className="flex flex-col items-end">
-                                    <span className="text-sm font-bold text-primary">+{formatEther(memo.amount)} USDC</span>
+                                    <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
                                     <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
                                 </div>
                             </div>
