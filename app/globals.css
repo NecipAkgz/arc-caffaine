@@ -63,3 +63,7 @@ body {
 html {
   overflow-y: auto;
 }
+
+button {
+  cursor: pointer;
+}

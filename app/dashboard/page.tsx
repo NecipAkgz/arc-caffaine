@@ -84,7 +84,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-2 bg-secondary/50 p-2 rounded-lg border border-border">
             <span className="text-sm text-muted-foreground px-2">Your Page:</span>
             <code className="text-sm font-mono bg-background px-2 py-1 rounded">{username ? `${window.location.origin}/${username}` : '...'}</code>
-            <button onClick={handleCopy} className="p-2 hover:bg-background rounded transition" title="Copy Link">
+            <button onClick={handleCopy} className="p-2 hover:bg-background rounded transition cursor-pointer" title="Copy Link">
                 {copied ? <span className="text-green-500 text-xs font-bold">Copied!</span> : <Copy className="w-4 h-4" />}
             </button>
             <Link href={`/${username}`} target="_blank" className="p-2 hover:bg-background rounded transition">
@@ -105,7 +105,7 @@ export default function Dashboard() {
             <button
                 onClick={handleWithdraw}
                 disabled={actionLoading || parseFloat(balance) <= 0}
-                className="mt-6 w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mt-6 w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
                 {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Withdraw Funds'}
             </button>

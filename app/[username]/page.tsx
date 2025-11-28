@@ -105,7 +105,7 @@ export default function PublicProfile() {
                                 key={val}
                                 type="button"
                                 onClick={() => setAmount(val)}
-                                className={`py-2 rounded-lg border transition ${amount === val ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-secondary'}`}
+                                className={`py-2 rounded-lg border transition cursor-pointer ${amount === val ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-input hover:bg-secondary'}`}
                             >
                                 {val} USDC
                             </button>
@@ -142,7 +142,7 @@ export default function PublicProfile() {
                         <button
                             type="submit"
                             disabled={actionLoading}
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                         >
                             {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Support ${amount} USDC`}
                         </button>
@@ -158,7 +158,7 @@ export default function PublicProfile() {
                                         type="button"
                                         onClick={openConnectModal}
                                         disabled={!ready}
-                                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
+                                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                                     >
                                         Connect Wallet to Support
                                     </button>
