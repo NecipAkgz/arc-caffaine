@@ -13,6 +13,7 @@ contract ArcCaffeine {
         uint256 timestamp;
         string name;
         string message;
+        uint256 amount;
     }
 
     // Store memos per user
@@ -25,7 +26,8 @@ contract ArcCaffeine {
         address indexed to,
         uint256 timestamp,
         string name,
-        string message
+        string message,
+        uint256 amount
     );
     event Withdrawal(address indexed user, uint256 amount);
     event BioUpdated(address indexed user, string bio);
@@ -86,10 +88,17 @@ contract ArcCaffeine {
 
         // Add memo to recipient's history
         userMemos[recipient].push(
-            Memo(msg.sender, block.timestamp, _name, _message)
+            Memo(msg.sender, block.timestamp, _name, _message, msg.value)
         );
 
-        emit NewMemo(msg.sender, recipient, block.timestamp, _name, _message);
+        emit NewMemo(
+            msg.sender,
+            recipient,
+            block.timestamp,
+            _name,
+            _message,
+            msg.value
+        );
     }
 
     /**

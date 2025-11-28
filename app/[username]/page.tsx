@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
 import { Loader2, Coffee, MessageSquare, Heart } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { createPublicClient, http } from 'viem'
+import { createPublicClient, http, formatEther } from 'viem'
 import { arcTestnet } from '@/lib/chain'
 import { toast } from 'sonner'
 
@@ -193,7 +193,10 @@ export default function PublicProfile() {
                         <div key={i} className="bg-secondary/20 border border-border rounded-xl p-4 space-y-2">
                             <div className="flex justify-between items-start">
                                 <span className="font-bold text-primary">{memo.name || 'Anonymous'}</span>
-                                <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-sm font-bold text-primary">+{formatEther(memo.amount)} USDC</span>
+                                    <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
+                                </div>
                             </div>
                             <p className="text-sm">{memo.message}</p>
                         </div>
