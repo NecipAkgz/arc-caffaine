@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata: Metadata = {
   title: "ArcCaffeine - Buy Me a Coffee on Arc",
   description: "Decentralized donations on Arc Testnet",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
