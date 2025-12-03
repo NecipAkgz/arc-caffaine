@@ -162,7 +162,7 @@ export default function PublicProfile() {
   return (
     <div className="bg-[#0c0a09] text-foreground selection:bg-primary/20">
       {/* Background Gradient */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-[#0c0a09] to-[#0c0a09] pointer-events-none -z-10" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/10 via-[#0c0a09] to-[#0c0a09] pointer-events-none -z-10" />
 
       <div className="relative max-w-6xl mx-auto p-4 md:p-8 lg:p-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -214,7 +214,7 @@ export default function PublicProfile() {
                             )}
                         >
                             <span className="relative z-10">{val} USDC</span>
-                            {amount === val && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />}
+                            {amount === val && <div className="absolute inset-0 bg-linear-90-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />}
                         </button>
                     ))}
                 </div>
@@ -260,7 +260,7 @@ export default function PublicProfile() {
                         <button
                             type="submit"
                             disabled={actionLoading}
-                            className="w-full bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-600/90 text-primary-foreground py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2 group"
+                            className="w-full bg-linear-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-600/90 text-primary-foreground py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2 group"
                         >
                             {actionLoading ? (
                               <Loader2 className="w-5 h-5 animate-spin" />
@@ -330,7 +330,7 @@ export default function PublicProfile() {
                         >
                             <div className="flex justify-between items-start mb-3">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-full flex items-center justify-center border border-white/5">
+                                  <div className="w-10 h-10 bg-linear-to-br from-zinc-800 to-zinc-900 rounded-full flex items-center justify-center border border-white/5">
                                     <span className="font-bold text-zinc-400 text-sm">
                                       {(memo.name?.trim() || 'A')[0].toUpperCase()}
                                     </span>
