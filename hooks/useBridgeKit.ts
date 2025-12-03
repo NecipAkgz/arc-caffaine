@@ -1,29 +1,72 @@
 import { BridgeKit } from '@circle-fin/bridge-kit'
 import { createAdapterFromProvider } from '@circle-fin/adapter-viem-v2'
-import { useWalletClient, useAccount } from 'wagmi'
-import { useState, useCallback } from 'react'
-import { getBridgeKitChainName, ARC_TESTNET } from '@/lib/bridge-kit/chains'
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
+import { useState, useCallback, useMemo } from 'react'
+import { getBridgeKitChainName, ARC_TESTNET, SUPPORTED_CHAINS } from '@/lib/bridge-kit/chains'
+import { parseUnits, erc20Abi } from 'viem'
 
 type BridgeStatus = 'idle' | 'bridging' | 'complete' | 'error'
 
+export type BridgeStep = 'idle' | 'preparing' | 'approving' | 'burning' | 'attesting' | 'minting' | 'complete'
+
 export function useBridgeKit() {
   const { data: walletClient } = useWalletClient()
-  const { chain, connector } = useAccount()
+  const publicClient = usePublicClient()
+  const { chain, connector, address } = useAccount()
   const [status, setStatus] = useState<BridgeStatus>('idle')
+  const [bridgeStep, setBridgeStep] = useState<BridgeStep>('idle')
   const [error, setError] = useState<Error | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
 
-  const kit = new BridgeKit()
+  const kit = useMemo(() => new BridgeKit(), [])
+
+  // ... rest of the code
 
   const bridgeToArc = useCallback(async (amount: string, sourceChainId: number) => {
-    if (!walletClient || !connector) {
+    if (!connector || !address || !publicClient) {
       throw new Error('Wallet not connected')
     }
 
     try {
       setStatus('bridging')
+      setBridgeStep('preparing')
       setError(null)
       setTxHash(null)
+
+      // Get chain data
+      const sourceChainData = SUPPORTED_CHAINS.find(c => c.id === sourceChainId)
+      if (!sourceChainData?.usdcAddress) {
+        throw new Error('Chain configuration missing')
+      }
+
+      // Setup Event Listeners
+      kit.on('approve', (payload) => {
+        console.log('Approval completed:', payload)
+        setBridgeStep('burning')
+      })
+
+      kit.on('burn', (payload) => {
+        console.log('Burn completed:', payload)
+        setBridgeStep('attesting')
+        // Extract txHash from burn event if available
+        if (payload?.values?.txHash) {
+          setTxHash(payload.values.txHash)
+        }
+      })
+
+      kit.on('fetchAttestation', (payload) => {
+        console.log('Attestation completed:', payload)
+        setBridgeStep('minting')
+      })
+
+      kit.on('mint', (payload) => {
+        console.log('Mint completed:', payload)
+        setBridgeStep('complete')
+        setStatus('complete')
+      })
+
+      // Step 1: Prepare Adapter
+      setBridgeStep('preparing')
 
       // Get the EIP-1193 provider from connector
       let eip1193Provider = null
@@ -54,11 +97,14 @@ export function useBridgeKit() {
         throw new Error('Unsupported chain')
       }
 
+      // 4. Bridge
+      setBridgeStep('approving')
+
       // Bridge USDC to Arc Network
       const result = await kit.bridge({
         from: {
           adapter,
-          chain: sourceChain as any // Type cast for Bridge Kit compatibility
+          chain: sourceChain as any
         },
         to: {
           adapter,
@@ -72,19 +118,26 @@ export function useBridgeKit() {
         setTxHash((result as any).txHash)
       }
 
-      setStatus('complete')
+      // Status update is handled by events or fallback here
+      if (!status || status !== 'complete') {
+         setBridgeStep('complete')
+         setStatus('complete')
+      }
+
       return result
 
     } catch (err) {
       console.error('Bridge error:', err)
       setStatus('error')
+      setBridgeStep('idle')
       setError(err as Error)
       throw err
     }
-  }, [walletClient, chain, kit])
+  }, [chain, kit, connector, address, publicClient])
 
   const reset = useCallback(() => {
     setStatus('idle')
+    setBridgeStep('idle')
     setError(null)
     setTxHash(null)
   }, [])
@@ -93,6 +146,7 @@ export function useBridgeKit() {
     bridgeToArc,
     reset,
     status,
+    bridgeStep,
     error,
     txHash,
     isIdle: status === 'idle',

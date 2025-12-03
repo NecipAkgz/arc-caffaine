@@ -29,7 +29,7 @@ interface BridgeModalProps {
 export default function BridgeModal({ isOpen, onClose, amount: defaultAmount, onBridgeComplete }: BridgeModalProps) {
   const { chain, address } = useAccount()
   const { switchChain } = useSwitchChain()
-  const { bridgeToArc, status, error, txHash, reset } = useBridgeKit()
+  const { bridgeToArc, status, bridgeStep, error, txHash, reset } = useBridgeKit()
   const [selectedChain, setSelectedChain] = useState(chain?.id)
   const [bridgeAmount, setBridgeAmount] = useState(defaultAmount)
   const [showChainDropdown, setShowChainDropdown] = useState(false)
@@ -308,18 +308,142 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount, on
             </>
           )}
 
-          {/* Bridging */}
+          {/* Bridging Progress Stepper */}
           {status === 'bridging' && (
-            <div className="space-y-4 text-center py-8">
-              <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto" />
-              <div>
-                <p className="font-bold text-lg">Bridging USDC...</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  This may take 1-2 minutes
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Please don't close this window
-                </p>
+            <div className="py-6 space-y-6">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-bold">Bridging in Progress</h3>
+                <p className="text-sm text-muted-foreground mt-1">Please follow the steps below</p>
+              </div>
+
+              <div className="space-y-6 px-4">
+                {/* Step 1: Initiate */}
+                <div className="flex items-start gap-4">
+                  <div className="relative">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
+                      ${bridgeStep !== 'preparing' ? 'border-green-500 text-green-500' : 'border-primary text-primary'}
+                    `}>
+                      {bridgeStep !== 'preparing' ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      )}
+                    </div>
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
+                  </div>
+                  <div className="pt-1">
+                    <p className={`font-medium ${bridgeStep === 'preparing' ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      Initiate Bridge
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Preparing bridge adapter...
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2: Approve */}
+                <div className="flex items-start gap-4">
+                  <div className="relative">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
+                      ${bridgeStep === 'approving' ? 'border-primary text-primary' :
+                        ['burning', 'attesting', 'minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
+                    `}>
+                      {bridgeStep === 'approving' ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : ['burning', 'attesting', 'minting', 'complete'].includes(bridgeStep) ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : (
+                        <span className="text-xs font-bold">2</span>
+                      )}
+                    </div>
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
+                  </div>
+                  <div className="pt-1">
+                    <p className={`font-medium ${bridgeStep === 'approving' ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      Approve USDC
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Allow bridge to spend your USDC
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3: Burn / Bridge */}
+                <div className="flex items-start gap-4">
+                  <div className="relative">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
+                      ${bridgeStep === 'burning' ? 'border-primary text-primary' :
+                        ['attesting', 'minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
+                    `}>
+                      {bridgeStep === 'burning' ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : ['attesting', 'minting', 'complete'].includes(bridgeStep) ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : (
+                        <span className="text-xs font-bold">3</span>
+                      )}
+                    </div>
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
+                  </div>
+                  <div className="pt-1">
+                    <p className={`font-medium ${bridgeStep === 'burning' ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      Bridge Transaction
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Sign the bridge transaction
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4: Attestation */}
+                <div className="flex items-start gap-4">
+                  <div className="relative">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
+                      ${bridgeStep === 'attesting' ? 'border-primary text-primary' :
+                        ['minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
+                    `}>
+                      {bridgeStep === 'attesting' ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : ['minting', 'complete'].includes(bridgeStep) ? (
+                        <CheckCircle className="w-5 h-5" />
+                      ) : (
+                        <span className="text-xs font-bold">4</span>
+                      )}
+                    </div>
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
+                  </div>
+                  <div className="pt-1">
+                    <p className={`font-medium ${bridgeStep === 'attesting' ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      Awaiting Attestation
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Waiting for Circle confirmation...
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 5: Mint / Complete */}
+                <div className="flex items-start gap-4">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
+                    ${['minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
+                  `}>
+                    {bridgeStep === 'complete' ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : bridgeStep === 'minting' ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <span className="text-xs font-bold">5</span>
+                    )}
+                  </div>
+                  <div className="pt-1">
+                    <p className={`font-medium ${['minting', 'complete'].includes(bridgeStep) ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      Mint & Complete
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Finalizing transfer on Arc Network
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

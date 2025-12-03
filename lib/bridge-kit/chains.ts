@@ -37,7 +37,7 @@ export const SUPPORTED_CHAINS: Chain[] = [
     id: 80002,
     name: 'Polygon Amoy',
     bridgeKitName: 'Polygon_Amoy',
-    iconName: 'matic', // Polygon symbol
+    iconName: 'Polygon', // Polygon symbol
     nativeCurrency: 'MATIC',
     usdcAddress: '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582', // USDC on Polygon Amoy
   },
