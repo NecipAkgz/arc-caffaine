@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, ArrowDown, Loader2, CheckCircle, XCircle, ExternalLink } from 'lucide-react'
+import { X, ArrowDown, Loader2, CheckCircle2, AlertCircle, ExternalLink, ChevronDown, Wallet } from 'lucide-react'
 import { useBridgeKit } from '@/hooks/useBridgeKit'
 import { useAccount, useSwitchChain, useReadContract } from 'wagmi'
 import { SUPPORTED_CHAINS, ARC_TESTNET } from '@/lib/bridge-kit/chains'
 import { formatUnits } from 'viem'
 import { ChainIcon } from '@/components/ChainIcon'
+import { cn } from '@/lib/utils'
 
 // ERC20 ABI for balanceOf function
 const ERC20_ABI = [
@@ -56,37 +57,43 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: 
     }
   }, [isOpen, defaultAmount])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showChainDropdown && !(event.target as Element).closest('.chain-selector')) {
+        setShowChainDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showChainDropdown])
+
   if (!isOpen) return null
 
   const handleBridge = async () => {
     try {
-      // Ensure wallet is on the selected chain
       if (selectedChain && chain?.id !== selectedChain) {
         await switchChain({ chainId: selectedChain })
-        // Wait a bit for the switch to complete
         await new Promise(resolve => setTimeout(resolve, 1000))
       }
 
-      if (!selectedChain) {
-        throw new Error('Please select a source chain')
-      }
+      if (!selectedChain) throw new Error('Please select a source chain')
 
-      // Pass selectedChain explicitly to avoid using stale chain state
       await bridgeToArc(bridgeAmount, selectedChain)
-
-      // Bridge complete - status will update to 'complete' and show success screen
     } catch (err) {
       console.error('Bridge failed:', err)
     }
   }
 
   const handleClose = () => {
+    if (status === 'bridging') return // Prevent closing while bridging
     reset()
     onClose()
   }
 
   const handleChainSelect = async (chainId: number) => {
     setSelectedChain(chainId)
+    setShowChainDropdown(false)
     if (chain?.id !== chainId) {
       await switchChain({ chainId })
     }
@@ -96,350 +103,303 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: 
 
   const formatError = (message: string) => {
     if (!message) return 'Unknown error occurred'
-    // Split by "Request Arguments" to hide technical details
     let cleanMessage = message.split('Request Arguments:')[0]
-    // Also split by "Details:" if present
     cleanMessage = cleanMessage.split('Details:')[0]
-    // Remove "Error: " prefix if present
     return cleanMessage.replace(/^Error:\s*/, '').trim()
   }
 
+  const StepItem = ({
+    step,
+    label,
+    description,
+    currentStep,
+    isLast
+  }: {
+    step: string,
+    label: string,
+    description: string,
+    currentStep: string,
+    isLast?: boolean
+  }) => {
+    const steps = ['preparing', 'approving', 'burning', 'attesting', 'minting', 'complete']
+    const currentIndex = steps.indexOf(currentStep)
+    const stepIndex = steps.indexOf(step)
+
+    let state: 'waiting' | 'current' | 'completed' = 'waiting'
+    if (currentStep === 'complete') state = 'completed'
+    else if (stepIndex < currentIndex) state = 'completed'
+    else if (stepIndex === currentIndex) state = 'current'
+
+    return (
+      <div className={cn("flex gap-4 relative", !isLast && "pb-8")}>
+        <div className={cn(
+          "relative z-10 w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 bg-[#09090b] shrink-0",
+          state === 'completed' && "border-green-500 text-green-500 bg-green-500/10",
+          state === 'current' && "border-primary text-primary animate-pulse",
+          state === 'waiting' && "border-white/10 text-zinc-600"
+        )}>
+          {state === 'completed' ? (
+            <CheckCircle2 className="w-5 h-5" />
+          ) : state === 'current' ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <div className="w-2 h-2 rounded-full bg-current" />
+          )}
+        </div>
+
+        {/* Connector Line */}
+        {!isLast && (
+          <div className={cn(
+            "absolute left-4 top-8 bottom-0 w-0.5 -translate-x-1/2 transition-colors duration-300",
+            state === 'completed' ? "bg-green-500/50" : "bg-white/5"
+          )} />
+        )}
+
+        <div className="pt-1">
+          <p className={cn(
+            "font-medium text-sm transition-colors",
+            state === 'waiting' ? "text-zinc-500" : "text-zinc-200"
+          )}>
+            {label}
+          </p>
+          <p className="text-xs text-zinc-500 mt-0.5">
+            {description}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-background border border-border rounded-2xl max-w-md w-full shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
+        onClick={handleClose}
+      />
+
+      {/* Modal Content */}
+      <div className="relative w-full max-w-md bg-[#09090b] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <h2 className="text-xl font-bold">Bridge to Arc Network</h2>
+        <div className="flex items-center justify-between p-6 border-b border-white/5">
+          <div>
+            <h2 className="text-xl font-bold text-white">Bridge to Arc</h2>
+            <p className="text-xs text-zinc-500 mt-1">Transfer USDC securely</p>
+          </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-secondary rounded-lg transition"
+            disabled={status === 'bridging'}
+            className="p-2 hover:bg-white/5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-zinc-400 hover:text-white"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Status Display */}
+        {/* Body */}
+        <div className="p-6">
           {status === 'idle' && (
-            <>
-              {/* Amount Input */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">
-                  Amount (USDC)
-                </label>
-                <input
-                  type="number"
-                  value={bridgeAmount}
-                  onChange={(e) => setBridgeAmount(e.target.value)}
-                  className="w-full bg-background border border-input rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary outline-none"
-                  placeholder="Enter amount"
-                  min="0.1"
-                  step="0.1"
-                />
-              </div>
+            <div className="space-y-4">
+              {/* From Section */}
+              <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/5 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-400">From</span>
+                  <div className="flex items-center gap-1 text-zinc-400">
+                    <Wallet className="w-3 h-3" />
+                    <span>{usdcBalance} USDC</span>
+                  </div>
+                </div>
 
-              {/* Bridge Route */}
-              <div className="space-y-4">
-                {/* From - Clickable Dropdown */}
-                <div className="relative">
-                  <p className="text-xs text-muted-foreground mb-2">From</p>
-                  <button
-                    type="button"
-                    onClick={() => setShowChainDropdown(!showChainDropdown)}
-                    className="w-full bg-secondary/30 hover:bg-secondary/50 border border-border rounded-lg p-4 flex items-center justify-between transition group"
-                  >
-                    {currentChain ? (
-                      <div className="flex items-center gap-3">
-                        <ChainIcon name={currentChain.iconName} size={40} />
-                        <div className="text-left">
-                          <p className="font-bold text-lg">{currentChain.name}</p>
-                          {isLoadingBalance ? (
-                            <p className="text-sm text-muted-foreground mt-1">Loading balance...</p>
-                          ) : usdcBalance && parseFloat(usdcBalance) > 0 ? (
-                            <p className="text-sm font-medium text-primary mt-1">
-                              {parseFloat(usdcBalance).toFixed(2)} USDC
-                            </p>
-                          ) : (
-                            <p className="text-sm text-muted-foreground mt-1">0.00 USDC</p>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground">Select source network...</span>
-                    )}
-                    <svg
-                      className={`w-5 h-5 text-muted-foreground transition-transform ${showChainDropdown ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                <div className="flex items-center gap-3">
+                  {/* Chain Selector */}
+                  <div className="relative chain-selector">
+                    <button
+                      onClick={() => setShowChainDropdown(!showChainDropdown)}
+                      className="flex items-center gap-2 bg-black/40 hover:bg-black/60 border border-white/10 rounded-xl px-3 py-2 transition-all min-w-[140px]"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+                      {currentChain ? (
+                        <>
+                          <ChainIcon name={currentChain.iconName} size={24} />
+                          <span className="font-medium text-sm text-white truncate flex-1 text-left">
+                            {currentChain.name}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-sm text-zinc-400">Select Chain</span>
+                      )}
+                      <ChevronDown className={cn("w-4 h-4 text-zinc-500 transition-transform", showChainDropdown && "rotate-180")} />
+                    </button>
 
-                  {/* Dropdown Menu */}
-                  {showChainDropdown && (
-                    <div className="absolute z-10 w-full mt-2 bg-background border border-border rounded-lg shadow-xl overflow-hidden">
-                      {SUPPORTED_CHAINS.filter(c => !c.isDestination).map((supportedChain) => {
-                        const isSelected = selectedChain === supportedChain.id
-                        const showBalance = isSelected && usdcBalance && parseFloat(usdcBalance) > 0
-                        const balance = showBalance
-                          ? parseFloat(usdcBalance).toFixed(2)
-                          : '0.00'
-
-                        return (
+                    {/* Dropdown */}
+                    {showChainDropdown && (
+                      <div className="absolute top-full left-0 mt-2 w-56 bg-[#111] border border-white/10 rounded-xl shadow-xl overflow-hidden z-20 py-1">
+                        {SUPPORTED_CHAINS.filter(c => !c.isDestination).map((chain) => (
                           <button
-                            key={supportedChain.id}
-                            type="button"
-                            onClick={() => {
-                              handleChainSelect(supportedChain.id)
-                              setShowChainDropdown(false)
-                            }}
-                            className={`
-                              w-full px-4 py-3 flex items-center gap-3 transition
-                              ${isSelected
-                                ? 'bg-primary/10 border-l-4 border-primary'
-                                : 'hover:bg-secondary/50 border-l-4 border-transparent'}
-                            `}
-                          >
-                            <ChainIcon name={supportedChain.iconName} size={32} />
-                            <div className="text-left flex-1">
-                              <p className="font-medium">{supportedChain.name}</p>
-                              {showBalance && (
-                                <p className="text-xs font-medium text-primary mt-1">
-                                  {balance} USDC
-                                </p>
-                              )}
-                            </div>
-                            {isSelected && (
-                              <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
+                            key={chain.id}
+                            onClick={() => handleChainSelect(chain.id)}
+                            className={cn(
+                              "w-full px-3 py-2.5 flex items-center gap-3 hover:bg-white/5 transition-colors text-left",
+                              selectedChain === chain.id && "bg-primary/10 text-primary"
                             )}
+                          >
+                            <ChainIcon name={chain.iconName} size={20} />
+                            <span className="text-sm font-medium">{chain.name}</span>
+                            {selectedChain === chain.id && <CheckCircle2 className="w-4 h-4 ml-auto" />}
                           </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex justify-center">
-                  <div className="bg-primary/20 p-2 rounded-full">
-                    <ArrowDown className="w-5 h-5 text-primary" />
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
 
-                {/* To */}
-                <div className="bg-secondary/30 rounded-lg p-4 border border-border">
-                  <p className="text-xs text-muted-foreground mb-2">To</p>
-                  <div className="flex items-center gap-3">
-                    <ChainIcon name={ARC_TESTNET.iconName} size={40} />
-                    <div>
-                      <p className="font-bold text-lg">{ARC_TESTNET.name}</p>
-                      <p className="text-sm text-muted-foreground mt-1">{bridgeAmount} USDC</p>
-                    </div>
-                  </div>
+                  {/* Amount Input */}
+                  <input
+                    type="number"
+                    value={bridgeAmount}
+                    onChange={(e) => setBridgeAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="flex-1 bg-transparent text-right text-2xl font-bold text-white placeholder-zinc-600 outline-none min-w-0"
+                  />
                 </div>
               </div>
 
-              {/* Info */}
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                <p className="text-xs text-blue-400">
-                  ℹ️ Bridge will take 1-2 minutes. Please don't close this window.
+              {/* Arrow Divider */}
+              <div className="flex justify-center -my-3 relative z-10">
+                <div className="bg-[#09090b] p-1.5 rounded-full border border-white/10">
+                  <ArrowDown className="w-4 h-4 text-zinc-500" />
+                </div>
+              </div>
+
+              {/* To Section */}
+              <div className="bg-zinc-900/50 rounded-2xl p-4 border border-white/5">
+                <div className="flex justify-between text-sm mb-3">
+                  <span className="text-zinc-400">To</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-3 py-2">
+                    <ChainIcon name={ARC_TESTNET.iconName} size={24} />
+                    <span className="font-medium text-sm text-white">{ARC_TESTNET.name}</span>
+                  </div>
+                  <span className="text-2xl font-bold text-zinc-500">
+                    {bridgeAmount || '0.00'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Info Banner */}
+              <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 flex gap-3">
+                <AlertCircle className="w-5 h-5 text-primary shrink-0" />
+                <p className="text-xs text-primary/80 leading-relaxed">
+                  Bridge usually takes 1-2 minutes. You will receive USDC on Arc Testnet automatically.
                 </p>
               </div>
 
               {/* Action Button */}
               <button
                 onClick={handleBridge}
-                disabled={!currentChain}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!currentChain || !bridgeAmount || parseFloat(bridgeAmount) <= 0}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
-                {currentChain ? 'Start Bridge' : 'Select a network first'}
+                {!currentChain ? 'Select Source Chain' :
+                 !bridgeAmount ? 'Enter Amount' :
+                 'Bridge Funds'}
               </button>
-            </>
+            </div>
           )}
 
-          {/* Bridging Progress Stepper */}
           {status === 'bridging' && (
-            <div className="py-6 space-y-6">
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-bold">Bridging in Progress</h3>
-                <p className="text-sm text-muted-foreground mt-1">Please follow the steps below</p>
+            <div className="py-2">
+               <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+                  <div className="absolute inset-0 rounded-full border-t-2 border-primary animate-spin" />
+                  <ChainIcon name="arc" size={32} />
+                </div>
+                <h3 className="text-lg font-bold text-white">Bridging in Progress</h3>
+                <p className="text-sm text-zinc-500 mt-1">Please keep this window open</p>
               </div>
 
-              <div className="space-y-6 px-4">
-                {/* Step 1: Initiate */}
-                <div className="flex items-start gap-4">
-                  <div className="relative">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
-                      ${bridgeStep !== 'preparing' ? 'border-green-500 text-green-500' : 'border-primary text-primary'}
-                    `}>
-                      {bridgeStep !== 'preparing' ? (
-                        <CheckCircle className="w-5 h-5" />
-                      ) : (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      )}
-                    </div>
-                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
-                  </div>
-                  <div className="pt-1">
-                    <p className={`font-medium ${bridgeStep === 'preparing' ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      Initiate Bridge
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Preparing bridge adapter...
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 2: Approve */}
-                <div className="flex items-start gap-4">
-                  <div className="relative">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
-                      ${bridgeStep === 'approving' ? 'border-primary text-primary' :
-                        ['burning', 'attesting', 'minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
-                    `}>
-                      {bridgeStep === 'approving' ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : ['burning', 'attesting', 'minting', 'complete'].includes(bridgeStep) ? (
-                        <CheckCircle className="w-5 h-5" />
-                      ) : (
-                        <span className="text-xs font-bold">2</span>
-                      )}
-                    </div>
-                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
-                  </div>
-                  <div className="pt-1">
-                    <p className={`font-medium ${bridgeStep === 'approving' ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      Approve USDC
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Allow bridge to spend your USDC
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3: Burn / Bridge */}
-                <div className="flex items-start gap-4">
-                  <div className="relative">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
-                      ${bridgeStep === 'burning' ? 'border-primary text-primary' :
-                        ['attesting', 'minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
-                    `}>
-                      {bridgeStep === 'burning' ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : ['attesting', 'minting', 'complete'].includes(bridgeStep) ? (
-                        <CheckCircle className="w-5 h-5" />
-                      ) : (
-                        <span className="text-xs font-bold">3</span>
-                      )}
-                    </div>
-                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
-                  </div>
-                  <div className="pt-1">
-                    <p className={`font-medium ${bridgeStep === 'burning' ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      Bridge Transaction
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Sign the bridge transaction
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 4: Attestation */}
-                <div className="flex items-start gap-4">
-                  <div className="relative">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
-                      ${bridgeStep === 'attesting' ? 'border-primary text-primary' :
-                        ['minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
-                    `}>
-                      {bridgeStep === 'attesting' ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : ['minting', 'complete'].includes(bridgeStep) ? (
-                        <CheckCircle className="w-5 h-5" />
-                      ) : (
-                        <span className="text-xs font-bold">4</span>
-                      )}
-                    </div>
-                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-border z-0" />
-                  </div>
-                  <div className="pt-1">
-                    <p className={`font-medium ${bridgeStep === 'attesting' ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      Awaiting Attestation
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Waiting for Circle confirmation...
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 5: Mint / Complete */}
-                <div className="flex items-start gap-4">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors z-10 relative bg-background
-                    ${['minting', 'complete'].includes(bridgeStep) ? 'border-green-500 text-green-500' : 'border-border text-muted-foreground'}
-                  `}>
-                    {bridgeStep === 'complete' ? (
-                      <CheckCircle className="w-5 h-5" />
-                    ) : bridgeStep === 'minting' ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <span className="text-xs font-bold">5</span>
-                    )}
-                  </div>
-                  <div className="pt-1">
-                    <p className={`font-medium ${['minting', 'complete'].includes(bridgeStep) ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      Mint & Complete
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Finalizing transfer on Arc Network
-                    </p>
-                  </div>
-                </div>
+              <div className="space-y-0 pl-4">
+                <StepItem
+                  step="preparing"
+                  currentStep={bridgeStep}
+                  label="Initiate Bridge"
+                  description="Preparing connection..."
+                />
+                <StepItem
+                  step="approving"
+                  currentStep={bridgeStep}
+                  label="Approve USDC"
+                  description="Please sign the approval request"
+                />
+                <StepItem
+                  step="burning"
+                  currentStep={bridgeStep}
+                  label="Bridge Transaction"
+                  description="Burning tokens on source chain"
+                />
+                <StepItem
+                  step="attesting"
+                  currentStep={bridgeStep}
+                  label="Attestation"
+                  description="Verifying cross-chain message"
+                />
+                <StepItem
+                  step="minting"
+                  currentStep={bridgeStep}
+                  label="Minting"
+                  description="Finalizing on Arc Network"
+                  isLast
+                />
               </div>
             </div>
           )}
 
-          {/* Complete */}
           {status === 'complete' && (
-            <div className="space-y-4 text-center py-8">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
-              <div>
-                <p className="font-bold text-lg text-green-500">Bridge Complete! 🎉</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Your USDC is now on Arc Network
-                </p>
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-10 h-10 text-green-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Bridge Complete!</h3>
+              <p className="text-zinc-400 mb-8">
+                Your funds have been successfully bridged to Arc Testnet.
+              </p>
+
+              <div className="space-y-3">
                 {txHash && (
                   <a
                     href={`https://testnet.arcscan.app/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"
+                    className="flex items-center justify-center gap-2 w-full bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded-xl transition-colors font-medium"
                   >
-                    View Transaction <ExternalLink className="w-3 h-3" />
+                    View on Explorer <ExternalLink className="w-4 h-4" />
                   </a>
                 )}
+                <button
+                  onClick={handleClose}
+                  className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-xl transition-colors font-bold"
+                >
+                  Close
+                </button>
               </div>
             </div>
           )}
 
-          {/* Error */}
           {status === 'error' && (
-            <div className="space-y-4 text-center py-8">
-              <XCircle className="w-16 h-16 text-red-500 mx-auto" />
-              <div>
-                <p className="font-bold text-lg text-red-500">Bridge Failed</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  {formatError(error?.message || 'Unknown error occurred')}
-                </p>
-                <button
-                  onClick={reset}
-                  className="mt-4 px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-lg text-sm font-medium transition"
-                >
-                  Try Again
-                </button>
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-10 h-10 text-red-500" />
               </div>
+              <h3 className="text-xl font-bold text-white mb-2">Bridge Failed</h3>
+              <p className="text-zinc-400 mb-8 text-sm px-4">
+                {formatError(error?.message || 'An unexpected error occurred')}
+              </p>
+
+              <button
+                onClick={reset}
+                className="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded-xl transition-colors font-medium"
+              >
+                Try Again
+              </button>
             </div>
           )}
         </div>
