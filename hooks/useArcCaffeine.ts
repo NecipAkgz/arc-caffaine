@@ -1,7 +1,7 @@
 import { useAccount, usePublicClient, useWalletClient, useSwitchChain } from 'wagmi'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
-import { useState, useEffect, useCallback } from 'react'
-import { parseEther } from 'viem'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { parseEther, createPublicClient, http } from 'viem'
 import { arcTestnet } from '@/lib/chain'
 
 export function useArcCaffeine() {
@@ -9,6 +9,12 @@ export function useArcCaffeine() {
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
   const { switchChainAsync } = useSwitchChain()
+
+  // Arc Testnet'e özel publicClient - her zaman Arc ağında kontrol yapar
+  const arcPublicClient = useMemo(() => createPublicClient({
+    chain: arcTestnet,
+    transport: http()
+  }), [])
 
   const [username, setUsername] = useState<string | null>(null)
   const [isRegistered, setIsRegistered] = useState(false)
@@ -25,9 +31,9 @@ export function useArcCaffeine() {
         setCheckedAddress(null)
         return
     }
-    if (!publicClient) return // Wait for publicClient
     try {
-      const name = await publicClient.readContract({
+      // Arc Testnet'e özel client kullanarak kontrol yap
+      const name = await arcPublicClient.readContract({
         address: CONTRACT_ADDRESS,
         abi: ARC_CAFFEINE_ABI,
         functionName: 'usernames',
@@ -47,7 +53,7 @@ export function useArcCaffeine() {
       setCheckingRegistration(false)
       if (address) setCheckedAddress(address)
     }
-  }, [address, publicClient])
+  }, [address, arcPublicClient])
 
   useEffect(() => {
     checkRegistration()
@@ -149,14 +155,14 @@ export function useArcCaffeine() {
   }, [walletClient, address, ensureNetwork, publicClient])
 
   const getBalance = useCallback(async () => {
-      if (!address || !publicClient) return BigInt(0)
-      return await publicClient.readContract({
+      if (!address) return BigInt(0)
+      return await arcPublicClient.readContract({
         address: CONTRACT_ADDRESS,
         abi: ARC_CAFFEINE_ABI,
         functionName: 'balances',
         args: [address]
       })
-  }, [address, publicClient])
+  }, [address, arcPublicClient])
 
   return {
     username,
