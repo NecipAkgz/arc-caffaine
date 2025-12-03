@@ -3,14 +3,12 @@ import { createAdapterFromProvider } from '@circle-fin/adapter-viem-v2'
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi'
 import { useState, useCallback, useMemo } from 'react'
 import { getBridgeKitChainName, ARC_TESTNET, SUPPORTED_CHAINS } from '@/lib/bridge-kit/chains'
-import { parseUnits, erc20Abi } from 'viem'
 
 type BridgeStatus = 'idle' | 'bridging' | 'complete' | 'error'
 
 export type BridgeStep = 'idle' | 'preparing' | 'approving' | 'burning' | 'attesting' | 'minting' | 'complete'
 
 export function useBridgeKit() {
-  const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
   const { chain, connector, address } = useAccount()
   const [status, setStatus] = useState<BridgeStatus>('idle')

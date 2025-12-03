@@ -412,7 +412,7 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: 
                 </p>
                 {txHash && (
                   <a
-                    href={`https://testnet.arcscan.com/tx/${txHash}`}
+                    href={`https://testnet.arcscan.app/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"

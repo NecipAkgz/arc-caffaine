@@ -1,5 +1,5 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { sepolia, baseSepolia, arbitrumSepolia, polygonAmoy } from 'wagmi/chains';
+import { sepolia, baseSepolia, unichainSepolia } from 'wagmi/chains';
 import { arcTestnet } from './chain';
 
 export const config = getDefaultConfig({
@@ -9,8 +9,7 @@ export const config = getDefaultConfig({
     arcTestnet,
     sepolia,
     baseSepolia,
-    arbitrumSepolia,
-    polygonAmoy,
+    unichainSepolia,
   ],
   ssr: true,
 });

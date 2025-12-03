@@ -26,20 +26,12 @@ export const SUPPORTED_CHAINS: Chain[] = [
     usdcAddress: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // USDC on Base Sepolia
   },
   {
-    id: 421614,
-    name: 'Arbitrum Sepolia',
-    bridgeKitName: 'Arbitrum_Sepolia',
-    iconName: 'Arbitrum', // Arbitrum symbol
+    id: 1301,
+    name: 'Unichain Sepolia',
+    bridgeKitName: 'Unichain_Sepolia',
+    iconName: 'Unichain', // Unichain symbol
     nativeCurrency: 'ETH',
-    usdcAddress: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d', // USDC on Arbitrum Sepolia
-  },
-  {
-    id: 80002,
-    name: 'Polygon Amoy',
-    bridgeKitName: 'Polygon_Amoy',
-    iconName: 'Polygon', // Polygon symbol
-    nativeCurrency: 'MATIC',
-    usdcAddress: '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582', // USDC on Polygon Amoy
+    usdcAddress: '0x31d0220469e10c4E71834a79b1f276d740d3768F', // USDC on Unichain Sepolia
   },
   {
     id: 5042002, // Arc Testnet
