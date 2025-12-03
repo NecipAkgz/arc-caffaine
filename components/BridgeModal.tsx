@@ -94,6 +94,16 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: 
 
   const currentChain = SUPPORTED_CHAINS.find(c => c.id === selectedChain)
 
+  const formatError = (message: string) => {
+    if (!message) return 'Unknown error occurred'
+    // Split by "Request Arguments" to hide technical details
+    let cleanMessage = message.split('Request Arguments:')[0]
+    // Also split by "Details:" if present
+    cleanMessage = cleanMessage.split('Details:')[0]
+    // Remove "Error: " prefix if present
+    return cleanMessage.replace(/^Error:\s*/, '').trim()
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-background border border-border rounded-2xl max-w-md w-full shadow-2xl">
@@ -421,7 +431,7 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: 
               <div>
                 <p className="font-bold text-lg text-red-500">Bridge Failed</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  {error?.message || 'Unknown error occurred'}
+                  {formatError(error?.message || 'Unknown error occurred')}
                 </p>
                 <button
                   onClick={reset}

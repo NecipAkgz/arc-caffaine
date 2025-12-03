@@ -118,10 +118,23 @@ export function useBridgeKit() {
         setTxHash((result as any).txHash)
       }
 
-      // Status update is handled by events or fallback here
-      if (!status || status !== 'complete') {
-         setBridgeStep('complete')
-         setStatus('complete')
+      // Check for soft errors (BridgeResult.state === 'error')
+      if (result && (result as any).state === 'error') {
+        const steps = (result as any).steps || []
+        const errorStep = steps.find((s: any) => s.state === 'error')
+        const errorMessage = errorStep?.error || 'Bridge transfer failed'
+        throw new Error(errorMessage)
+      }
+
+      // Handle pending state
+      if (result && (result as any).state === 'pending') {
+        throw new Error('Bridge transfer is pending. Please check transaction status.')
+      }
+
+      // Only mark as complete if explicitly successful
+      if (result && (result as any).state === 'success') {
+        setBridgeStep('complete')
+        setStatus('complete')
       }
 
       return result
