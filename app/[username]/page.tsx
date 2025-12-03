@@ -4,7 +4,7 @@
 import { useArcCaffeine } from '@/hooks/useArcCaffeine'
 import { useEffect, useState } from 'react'
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from '@/lib/abi'
-import { Loader2, Coffee, MessageSquare, Heart } from 'lucide-react'
+import { Loader2, Coffee, MessageSquare, Heart, Zap } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { createPublicClient, http, formatEther } from 'viem'
 import { arcTestnet } from '@/lib/chain'
@@ -12,6 +12,8 @@ import { toast } from 'sonner'
 
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import BridgeModal from '@/components/BridgeModal'
+import { isBridgeSupported, ARC_TESTNET } from '@/lib/bridge-kit/chains'
 
 export default function PublicProfile() {
   const params = useParams()
@@ -28,6 +30,9 @@ export default function PublicProfile() {
   const [message, setMessage] = useState('')
   const [amount, setAmount] = useState('5') // Default 5 USDC
   const [newMemoKey, setNewMemoKey] = useState(0) // For triggering animation
+  const [showBridgeModal, setShowBridgeModal] = useState(false)
+
+  const { chain } = useAccount()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,8 +80,13 @@ export default function PublicProfile() {
     fetchData()
   }, [username])
 
-  const handleSupport = async (e: React.FormEvent) => {
-      e.preventDefault()
+  const handleBridgeComplete = async () => {
+      // Bridge tamamlandı, şimdi donation yap
+      await handleSupport()
+  }
+
+  const handleSupport = async (e?: React.FormEvent) => {
+      if (e) e.preventDefault()
       if (!recipientAddress) return
 
       const promise = buyCoffee(username, name, message, amount)
@@ -181,13 +191,25 @@ export default function PublicProfile() {
                     />
 
                     {isConnected ? (
-                        <button
-                            type="submit"
-                            disabled={actionLoading}
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                        >
-                            {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Support ${amount} USDC`}
-                        </button>
+                        <div className="space-y-2">
+                            <button
+                                type="submit"
+                                disabled={actionLoading}
+                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                            >
+                                {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Support ${amount} USDC`}
+                            </button>
+
+                            {/* Bridge Button - Always visible */}
+                            <button
+                                type="button"
+                                onClick={() => setShowBridgeModal(true)}
+                                className="w-full bg-secondary hover:bg-secondary/80 text-foreground px-4 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2 border border-border"
+                            >
+                                <Zap className="w-4 h-4" />
+                                Bridge & Support
+                            </button>
+                        </div>
                     ) : (
                         <ConnectButton.Custom>
                             {({
@@ -211,6 +233,14 @@ export default function PublicProfile() {
                 </form>
             </div>
         </div>
+
+        {/* Bridge Modal */}
+        <BridgeModal
+            isOpen={showBridgeModal}
+            onClose={() => setShowBridgeModal(false)}
+            amount={amount}
+            onBridgeComplete={handleBridgeComplete}
+        />
 
         {/* Right: Feed */}
         <div className="space-y-6">
