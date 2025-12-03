@@ -80,10 +80,7 @@ export default function PublicProfile() {
     fetchData()
   }, [username])
 
-  const handleBridgeComplete = async () => {
-      // Bridge tamamlandı, şimdi donation yap
-      await handleSupport()
-  }
+
 
   const handleSupport = async (e?: React.FormEvent) => {
       if (e) e.preventDefault()
@@ -207,7 +204,7 @@ export default function PublicProfile() {
                                 className="w-full bg-secondary hover:bg-secondary/80 text-foreground px-4 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2 border border-border"
                             >
                                 <Zap className="w-4 h-4" />
-                                Bridge & Support
+                                Bridge USDC
                             </button>
                         </div>
                     ) : (
@@ -239,7 +236,6 @@ export default function PublicProfile() {
             isOpen={showBridgeModal}
             onClose={() => setShowBridgeModal(false)}
             amount={amount}
-            onBridgeComplete={handleBridgeComplete}
         />
 
         {/* Right: Feed */}

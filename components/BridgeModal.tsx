@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, ArrowDown, Loader2, CheckCircle, XCircle, ExternalLink, HelpCircle } from 'lucide-react'
+import { X, ArrowDown, Loader2, CheckCircle, XCircle, ExternalLink } from 'lucide-react'
 import { useBridgeKit } from '@/hooks/useBridgeKit'
 import { useAccount, useSwitchChain, useReadContract } from 'wagmi'
 import { SUPPORTED_CHAINS, ARC_TESTNET } from '@/lib/bridge-kit/chains'
@@ -23,18 +23,15 @@ interface BridgeModalProps {
   isOpen: boolean
   onClose: () => void
   amount: string
-  onBridgeComplete: () => void
 }
 
-export default function BridgeModal({ isOpen, onClose, amount: defaultAmount, onBridgeComplete }: BridgeModalProps) {
+export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: BridgeModalProps) {
   const { chain, address } = useAccount()
   const { switchChain } = useSwitchChain()
   const { bridgeToArc, status, bridgeStep, error, txHash, reset } = useBridgeKit()
   const [selectedChain, setSelectedChain] = useState(chain?.id)
   const [bridgeAmount, setBridgeAmount] = useState(defaultAmount)
   const [showChainDropdown, setShowChainDropdown] = useState(false)
-  const [autoDonate, setAutoDonate] = useState(true)
-  const [showTooltip, setShowTooltip] = useState(false)
 
   // Fetch USDC balance for selected chain using contract read
   const selectedChainData = SUPPORTED_CHAINS.find(c => c.id === selectedChain)
@@ -77,18 +74,7 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount, on
       // Pass selectedChain explicitly to avoid using stale chain state
       await bridgeToArc(bridgeAmount, selectedChain)
 
-      // Bridge başarılı, auto-donate açıksa donation yap
-      if (autoDonate) {
-        setTimeout(() => {
-          onBridgeComplete()
-          handleClose()
-        }, 2000)
-      } else {
-        // Auto-donate kapalıysa sadece modal'ı kapat
-        setTimeout(() => {
-          handleClose()
-        }, 2000)
-      }
+      // Bridge complete - status will update to 'complete' and show success screen
     } catch (err) {
       console.error('Bridge failed:', err)
     }
@@ -141,49 +127,6 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount, on
                   min="0.1"
                   step="0.1"
                 />
-              </div>
-
-              {/* Auto-Donate Toggle */}
-              <div className="bg-secondary/20 border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="auto-donate" className="text-sm font-medium cursor-pointer">
-                      Auto-donate after bridge
-                    </label>
-                    <div className="relative">
-                      <button
-                        onMouseEnter={() => setShowTooltip(true)}
-                        onMouseLeave={() => setShowTooltip(false)}
-                        className="text-muted-foreground hover:text-foreground transition"
-                      >
-                        <HelpCircle className="w-4 h-4" />
-                      </button>
-                      {showTooltip && (
-                        <div className="absolute left-0 top-6 w-64 bg-popover border border-border rounded-lg p-3 shadow-xl z-10">
-                          <p className="text-xs text-muted-foreground">
-                            When enabled, your bridged USDC will automatically be donated after the bridge completes.
-                            If disabled, you'll need to manually confirm the donation.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    id="auto-donate"
-                    onClick={() => setAutoDonate(!autoDonate)}
-                    className={`
-                      relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                      ${autoDonate ? 'bg-primary' : 'bg-secondary'}
-                    `}
-                  >
-                    <span
-                      className={`
-                        inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                        ${autoDonate ? 'translate-x-6' : 'translate-x-1'}
-                      `}
-                    />
-                  </button>
-                </div>
               </div>
 
               {/* Bridge Route */}
