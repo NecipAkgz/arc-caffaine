@@ -19,6 +19,16 @@ export type BridgeStep =
   | "minting"
   | "complete";
 
+// Singleton BridgeKit instance - tüm hook kullanımlarında aynı instance kullanılır
+let bridgeKitInstance: BridgeKit | null = null;
+
+const getBridgeKitInstance = () => {
+  if (!bridgeKitInstance) {
+    bridgeKitInstance = new BridgeKit();
+  }
+  return bridgeKitInstance;
+};
+
 export function useBridgeKit() {
   const publicClient = usePublicClient();
   const { chain, connector, address } = useAccount();
@@ -27,7 +37,7 @@ export function useBridgeKit() {
   const [error, setError] = useState<Error | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  const kit = useMemo(() => new BridgeKit(), []);
+  const kit = useMemo(() => getBridgeKitInstance(), []);
 
   // ... rest of the code
 
