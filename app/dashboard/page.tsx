@@ -12,6 +12,12 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import BioModal from '@/components/BioModal'
 
+/**
+ * User Dashboard Component
+ *
+ * Displays the user's balance, stats, profile bio, and transaction history.
+ * Allows withdrawing funds and updating the bio.
+ */
 export default function Dashboard() {
   const { address } = useAccount()
   const publicClient = usePublicClient()
@@ -71,6 +77,9 @@ export default function Dashboard() {
       fetchBio()
   }, [address, publicClient])
 
+  /**
+   * Copies the user's public profile link to the clipboard.
+   */
   const handleCopy = () => {
     if (username) {
         const url = `${window.location.origin}/${username}`
@@ -81,12 +90,21 @@ export default function Dashboard() {
     }
   }
 
+  /**
+   * Updates the user's bio.
+   *
+   * @param newBio - The new bio text to save.
+   */
   const handleSaveBio = async (newBio: string) => {
     // BioModal handles the toast notifications
     await updateBio(newBio)
     setBio(newBio)
   }
 
+  /**
+   * Withdraws all available funds to the user's wallet.
+   * Refreshes the balance after a successful withdrawal.
+   */
   const handleWithdraw = async () => {
     const promise = withdraw().then(async () => {
         // Refresh balance

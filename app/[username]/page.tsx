@@ -24,6 +24,12 @@ const ERC20_ABI = [
   },
 ] as const
 
+/**
+ * Public Profile Page Component
+ *
+ * Displays a user's profile, including their bio, received messages (memos),
+ * and a donation form to send USDC on the Arc Testnet.
+ */
 export default function PublicProfile() {
   const params = useParams()
   const username = params.username as string
@@ -41,6 +47,10 @@ export default function PublicProfile() {
   const [newMemoKey, setNewMemoKey] = useState(0)
   const [showBridgeModal, setShowBridgeModal] = useState(false)
 
+  /**
+   * Fetch the user's USDC balance on the Arc Testnet.
+   * Updates automatically every 5 seconds.
+   */
   // Fetch Balance
   const { data: arcUsdcBalance } = useReadContract({
     address: ARC_TESTNET.usdcAddress as `0x${string}`,
@@ -56,6 +66,10 @@ export default function PublicProfile() {
 
   const formattedBalance = arcUsdcBalance ? formatUnits(arcUsdcBalance as bigint, 6) : '0.00'
 
+  /**
+   * Effect to fetch the profile data (address, bio, memos) for the given username.
+   * Uses a public client to read from the smart contract.
+   */
   useEffect(() => {
     const fetchData = async () => {
       const client = createPublicClient({
@@ -102,6 +116,14 @@ export default function PublicProfile() {
     fetchData()
   }, [username])
 
+  /**
+   * Handles the donation process (buying coffee).
+   *
+   * 1. Validates the recipient address.
+   * 2. Calls the buyCoffee function from the hook.
+   * 3. Refetches the memos list after a successful transaction.
+   * 4. Displays toast notifications for status updates.
+   */
   const handleSupport = async (e?: React.FormEvent) => {
       if (e) e.preventDefault()
       if (!recipientAddress) return

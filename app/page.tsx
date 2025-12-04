@@ -9,6 +9,12 @@ import { Coffee, ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
+/**
+ * Landing Page Component
+ *
+ * Displays the welcome screen, wallet connection button, and user registration form.
+ * Redirects registered users to the dashboard.
+ */
 export default function Home() {
   const { isConnected, address } = useAccount()
   const { isRegistered, register, loading, username, checkingRegistration, checkedAddress } = useArcCaffeine()
@@ -16,6 +22,11 @@ export default function Home() {
   const [bio, setBio] = useState('')
   const router = useRouter()
 
+  /**
+   * Handles user registration.
+   *
+   * Calls the register function from the hook and redirects to the dashboard on success.
+   */
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newUsername) return

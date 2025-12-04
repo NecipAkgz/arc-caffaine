@@ -26,6 +26,16 @@ interface BridgeModalProps {
   amount: string
 }
 
+/**
+ * Bridge Modal Component
+ *
+ * Provides a UI for bridging USDC from other supported chains to the Arc Testnet.
+ * Handles the bridging process, status display, and error handling.
+ *
+ * @param isOpen - Whether the modal is open.
+ * @param onClose - Function to close the modal.
+ * @param amount - Default amount to bridge.
+ */
 export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: BridgeModalProps) {
   const { chain, address } = useAccount()
   const { switchChain } = useSwitchChain()
@@ -70,6 +80,13 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: 
 
   if (!isOpen) return null
 
+  /**
+   * Initiates the bridge transfer.
+   *
+   * 1. Switches network if necessary.
+   * 2. Validates inputs.
+   * 3. Calls the bridgeToArc function from the hook.
+   */
   const handleBridge = async () => {
     try {
       if (selectedChain && chain?.id !== selectedChain) {
@@ -108,6 +125,9 @@ export default function BridgeModal({ isOpen, onClose, amount: defaultAmount }: 
     return cleanMessage.replace(/^Error:\s*/, '').trim()
   }
 
+  /**
+   * Helper component to render a single step in the bridging progress stepper.
+   */
   const StepItem = ({
     step,
     label,

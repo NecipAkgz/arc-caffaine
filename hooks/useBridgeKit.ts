@@ -19,7 +19,7 @@ export type BridgeStep =
   | "minting"
   | "complete";
 
-// Singleton BridgeKit instance - tüm hook kullanımlarında aynı instance kullanılır
+// The Singleton BridgeKit instance – the same instance is used for all hook usages.
 let bridgeKitInstance: BridgeKit | null = null;
 
 const getBridgeKitInstance = () => {
@@ -29,6 +29,10 @@ const getBridgeKitInstance = () => {
   return bridgeKitInstance;
 };
 
+/**
+ * Custom hook for bridging assets using Circle's BridgeKit.
+ * Manages the bridging state, steps, and errors.
+ */
 export function useBridgeKit() {
   const publicClient = usePublicClient();
   const { chain, connector, address } = useAccount();
@@ -39,8 +43,12 @@ export function useBridgeKit() {
 
   const kit = useMemo(() => getBridgeKitInstance(), []);
 
-  // ... rest of the code
-
+  /**
+   * Initiates the bridging process to the Arc Network.
+   *
+   * @param amount - The amount of USDC to bridge.
+   * @param sourceChainId - The ID of the source chain.
+   */
   const bridgeToArc = useCallback(
     async (amount: string, sourceChainId: number) => {
       if (!connector || !address || !publicClient) {
