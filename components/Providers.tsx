@@ -10,11 +10,26 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
-import { config } from '@/lib/config';
 
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const [config, setConfig] = React.useState<any>(null);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+    // Only load config on client side
+    import('@/lib/config').then((mod) => {
+      setConfig(mod.config);
+    });
+  }, []);
+
+  // Don't render anything until mounted on client
+  if (!mounted || !config) {
+    return null;
+  }
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
