@@ -12,13 +12,18 @@ const nextConfig: NextConfig = {
   ],
   turbopack: {
     resolveAlias: {
-      'pino-pretty': './empty.js',
-      'lokijs': './empty.js',
-      'encoding': './empty.js',
+      "pino-pretty": "./empty.js",
+      lokijs: "./empty.js",
+      encoding: "./empty.js",
     },
   },
   webpack: (config) => {
     config.externals.push("pino-pretty", "lokijs", "encoding");
+
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@react-native-async-storage/async-storage": false,
+    };
 
     // Ignore test files that cause build issues
     config.module.rules.push({
