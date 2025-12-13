@@ -40,6 +40,7 @@ export function useBridgeKit() {
   const [bridgeStep, setBridgeStep] = useState<BridgeStep>("idle");
   const [error, setError] = useState<Error | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [sourceChainId, setSourceChainId] = useState<number | null>(null);
 
   const kit = useMemo(() => getBridgeKitInstance(), []);
 
@@ -60,6 +61,7 @@ export function useBridgeKit() {
         setBridgeStep("preparing");
         setError(null);
         setTxHash(null);
+        setSourceChainId(sourceChainId);
 
         // Get chain data
         const sourceChainData = SUPPORTED_CHAINS.find(
@@ -197,6 +199,7 @@ export function useBridgeKit() {
     setBridgeStep("idle");
     setError(null);
     setTxHash(null);
+    setSourceChainId(null);
   }, []);
 
   return {
@@ -206,6 +209,7 @@ export function useBridgeKit() {
     bridgeStep,
     error,
     txHash,
+    sourceChainId,
     isIdle: status === "idle",
     isBridging: status === "bridging",
     isComplete: status === "complete",

@@ -1,13 +1,11 @@
 'use client'
 
 import { useAccount } from 'wagmi'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useArcCaffeine } from '@/hooks/useArcCaffeine'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRegisterForm } from '@/hooks/useRegisterForm'
 import { Coffee, ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { toast } from 'sonner'
+import { CustomConnectButton } from '@/components/CustomConnectButton'
 
 /**
  * Landing Page Component
@@ -17,26 +15,15 @@ import { toast } from 'sonner'
  */
 export default function Home() {
   const { isConnected, address } = useAccount()
-  const { isRegistered, register, loading, username, checkingRegistration, checkedAddress } = useArcCaffeine()
-  const [newUsername, setNewUsername] = useState('')
-  const [bio, setBio] = useState('')
-  const router = useRouter()
-
-  /**
-   * Handles user registration.
-   *
-   * Calls the register function from the hook and redirects to the dashboard on success.
-   */
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newUsername) return
-    try {
-      await register(newUsername, bio)
-      router.push('/dashboard')
-    } catch (e) {
-      toast.error("Registration failed. Check console.")
-    }
-  }
+  const { isRegistered, username, checkingRegistration, checkedAddress } = useArcCaffeine()
+  const {
+    username: newUsername,
+    setUsername,
+    bio,
+    setBio,
+    loading,
+    handleSubmit,
+  } = useRegisterForm()
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
@@ -56,69 +43,24 @@ export default function Home() {
 
         <div className="flex flex-col items-center gap-4">
           {!isConnected ? (
-            <ConnectButton.Custom>
-              {({
-                account,
-                chain,
-                openAccountModal,
-                openChainModal,
-                openConnectModal,
-                authenticationStatus,
-                mounted,
-              }) => {
-                const ready = mounted && authenticationStatus !== 'loading';
-                const connected =
-                  ready &&
-                  account &&
-                  chain &&
-                  (!authenticationStatus ||
-                    authenticationStatus === 'authenticated');
-
-                return (
-                  <div
-                    {...(!ready && {
-                      'aria-hidden': true,
-                      'style': {
-                        opacity: 0,
-                        pointerEvents: 'none',
-                        userSelect: 'none',
-                      },
-                    })}
-                  >
-                    {(() => {
-                      if (!connected) {
-                        return (
-                          <button
-                            onClick={openConnectModal}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full text-lg font-bold transition shadow-lg hover:shadow-primary/25 flex items-center gap-2 cursor-pointer"
-                          >
-                            Connect Wallet <ArrowRight className="w-5 h-5" />
-                          </button>
-                        );
-                      }
-                      return null;
-                    })()}
-                  </div>
-                );
-              }}
-            </ConnectButton.Custom>
+            <CustomConnectButton />
           ) : checkingRegistration || (isConnected && (!address || address !== checkedAddress)) ? (
             <div className="flex flex-col items-center justify-center p-8">
-                <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
-                <p className="text-muted-foreground">Checking profile...</p>
+              <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+              <p className="text-muted-foreground">Checking profile...</p>
             </div>
           ) : isRegistered ? (
-             <div className="space-y-4">
-               <p className="text-lg">Welcome back, <span className="font-bold text-primary">@{username}</span>!</p>
-               <Link
-                 href="/dashboard"
-                 className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full text-lg font-bold transition"
-               >
-                 Go to Dashboard <ArrowRight className="w-5 h-5" />
-               </Link>
-             </div>
+            <div className="space-y-4">
+              <p className="text-lg">Welcome back, <span className="font-bold text-primary">@{username}</span>!</p>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full text-lg font-bold transition"
+              >
+                Go to Dashboard <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
           ) : (
-            <form onSubmit={handleRegister} className="w-full max-w-md space-y-4 bg-secondary/50 p-8 rounded-2xl border border-border backdrop-blur-sm">
+            <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4 bg-secondary/50 p-8 rounded-2xl border border-border backdrop-blur-sm">
               <h2 className="text-2xl font-bold">Create your Profile</h2>
               <div className="flex flex-col gap-2 text-left">
                 <label htmlFor="username" className="text-sm font-medium text-muted-foreground">Choose a Username</label>
@@ -127,7 +69,7 @@ export default function Home() {
                   type="text"
                   placeholder="username"
                   value={newUsername}
-                  onChange={(e) => setNewUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="bg-background border border-input rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
                   required
                 />

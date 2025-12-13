@@ -13,20 +13,24 @@ import { WagmiProvider } from 'wagmi';
 
 const queryClient = new QueryClient();
 
+/**
+ * Providers Component
+ *
+ * Wraps the application with necessary providers for Web3 functionality.
+ * Uses dynamic import to avoid SSR issues with WalletConnect (requires indexedDB).
+ */
 export function Providers({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = React.useState<any>(null);
-  const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
-    // Only load config on client side
+    // Load config only on client side to avoid indexedDB SSR errors
     import('@/lib/config').then((mod) => {
       setConfig(mod.config);
     });
   }, []);
 
-  // Don't render anything until mounted on client
-  if (!mounted || !config) {
+  // Show nothing until config is loaded (prevents hydration mismatch)
+  if (!config) {
     return null;
   }
 

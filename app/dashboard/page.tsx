@@ -135,113 +135,115 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8">
-      <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
-        <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, @{username}</p>
+    <div className="w-full px-4 md:px-8 py-8">
+      <div className="mx-auto space-y-8" style={{ maxWidth: '1024px' }}>
+        <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+          <div>
+              <h1 className="text-3xl font-bold">Dashboard</h1>
+              <p className="text-muted-foreground">Welcome back, @{username}</p>
+          </div>
+          <div className="flex items-center gap-2 bg-secondary/50 p-2 rounded-lg border border-border">
+              <span className="text-sm text-muted-foreground px-2">Your Page:</span>
+              <code className="text-sm font-mono bg-background px-2 py-1 rounded">{username ? `${window.location.origin}/${username}` : '...'}</code>
+              <button onClick={handleCopy} className="p-2 hover:bg-background rounded transition cursor-pointer" title="Copy Link">
+                  {copied ? <span className="text-green-500 text-xs font-bold">Copied!</span> : <Copy className="w-4 h-4" />}
+              </button>
+              <Link href={`/${username}`} target="_blank" className="p-2 hover:bg-background rounded transition">
+                  <ExternalLink className="w-4 h-4" />
+              </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2 bg-secondary/50 p-2 rounded-lg border border-border">
-            <span className="text-sm text-muted-foreground px-2">Your Page:</span>
-            <code className="text-sm font-mono bg-background px-2 py-1 rounded">{username ? `${window.location.origin}/${username}` : '...'}</code>
-            <button onClick={handleCopy} className="p-2 hover:bg-background rounded transition cursor-pointer" title="Copy Link">
-                {copied ? <span className="text-green-500 text-xs font-bold">Copied!</span> : <Copy className="w-4 h-4" />}
-            </button>
-            <Link href={`/${username}`} target="_blank" className="p-2 hover:bg-background rounded transition">
-                <ExternalLink className="w-4 h-4" />
-            </Link>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Balance Card */}
+          <div className="bg-secondary/30 border border-border rounded-2xl p-6 flex flex-col justify-between h-full">
+              <div>
+                  <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
+                      <DollarSign className="w-5 h-5" /> Current Balance
+                  </h3>
+                  <p className="text-4xl font-bold mt-4">{parseFloat(balance).toFixed(4)} <span className="text-lg text-muted-foreground">USDC</span></p>
+              </div>
+              <button
+                  onClick={handleWithdraw}
+                  disabled={actionLoading || parseFloat(balance) <= 0}
+                  className="mt-6 w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                  {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Withdraw Funds'}
+              </button>
+          </div>
+
+          {/* Stats Card (Placeholder) */}
+          <div className="bg-secondary/30 border border-border rounded-2xl p-6">
+              <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
+                  <Coffee className="w-5 h-5" /> Total Coffees
+              </h3>
+              <p className="text-4xl font-bold mt-4">{memos.length}</p>
+              <p className="text-sm text-muted-foreground mt-2">Lifetime supporters</p>
+          </div>
+
+          {/* Profile Settings */}
+          <div className="bg-secondary/30 border border-border rounded-2xl p-6 flex flex-col">
+              <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
+                      <User className="w-5 h-5" /> Profile Bio
+                  </h3>
+                  <button
+                      onClick={() => setIsBioModalOpen(true)}
+                      className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground"
+                      title="Edit Bio"
+                  >
+                      <Edit className="w-4 h-4" />
+                  </button>
+              </div>
+
+              <div className="flex-1 bg-background/50 rounded-lg p-4 border border-border/50">
+                  {bio ? (
+                      <p className="text-sm text-foreground/90 whitespace-pre-wrap">{bio}</p>
+                  ) : (
+                      <p className="text-sm text-muted-foreground italic">No bio set yet. Click edit to add one.</p>
+                  )}
+              </div>
+          </div>
         </div>
+
+        {/* History */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2"><History className="w-6 h-6" /> Recent Support</h2>
+          <div className={`scroll-container ${memos.length > 3 ? 'has-scroll' : ''}`}>
+              <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
+                  {memos.length === 0 ? (
+                      <p className="text-muted-foreground">No coffees received yet. Share your link!</p>
+                  ) : (
+                      memos.map((memo, i) => (
+                          <div key={i} className="bg-secondary/20 border border-border rounded-xl p-4 flex gap-4 items-start">
+                              <div className="bg-primary/10 p-3 rounded-full">
+                                  <Coffee className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="flex-1">
+                                  <div className="flex justify-between items-start">
+                                      <h4 className="font-bold">{memo.name?.trim() || 'Anonymous'}</h4>
+                                      <div className="flex flex-col items-end">
+                                          <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
+                                          <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
+                                      </div>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground mt-1">{memo.message?.trim() || 'No message'}</p>
+                                  <p className="text-xs text-muted-foreground mt-2 font-mono">From: {memo.from.slice(0,6)}...{memo.from.slice(-4)}</p>
+                              </div>
+                          </div>
+                      ))
+                  )}
+              </div>
+          </div>
+        </div>
+
+        <BioModal
+          isOpen={isBioModalOpen}
+          onClose={() => setIsBioModalOpen(false)}
+          initialBio={bio}
+          onSave={handleSaveBio}
+        />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Balance Card */}
-        <div className="bg-secondary/30 border border-border rounded-2xl p-6 flex flex-col justify-between h-full">
-            <div>
-                <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
-                    <DollarSign className="w-5 h-5" /> Current Balance
-                </h3>
-                <p className="text-4xl font-bold mt-4">{parseFloat(balance).toFixed(4)} <span className="text-lg text-muted-foreground">USDC</span></p>
-            </div>
-            <button
-                onClick={handleWithdraw}
-                disabled={actionLoading || parseFloat(balance) <= 0}
-                className="mt-6 w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-                {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Withdraw Funds'}
-            </button>
-        </div>
-
-        {/* Stats Card (Placeholder) */}
-        <div className="bg-secondary/30 border border-border rounded-2xl p-6">
-            <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
-                <Coffee className="w-5 h-5" /> Total Coffees
-            </h3>
-            <p className="text-4xl font-bold mt-4">{memos.length}</p>
-            <p className="text-sm text-muted-foreground mt-2">Lifetime supporters</p>
-        </div>
-
-        {/* Profile Settings */}
-        <div className="bg-secondary/30 border border-border rounded-2xl p-6 flex flex-col">
-            <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
-                    <User className="w-5 h-5" /> Profile Bio
-                </h3>
-                <button
-                    onClick={() => setIsBioModalOpen(true)}
-                    className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground"
-                    title="Edit Bio"
-                >
-                    <Edit className="w-4 h-4" />
-                </button>
-            </div>
-
-            <div className="flex-1 bg-background/50 rounded-lg p-4 border border-border/50">
-                {bio ? (
-                    <p className="text-sm text-foreground/90 whitespace-pre-wrap">{bio}</p>
-                ) : (
-                    <p className="text-sm text-muted-foreground italic">No bio set yet. Click edit to add one.</p>
-                )}
-            </div>
-        </div>
-      </div>
-
-      {/* History */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold flex items-center gap-2"><History className="w-6 h-6" /> Recent Support</h2>
-        <div className={`scroll-container ${memos.length > 3 ? 'has-scroll' : ''}`}>
-            <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
-                {memos.length === 0 ? (
-                    <p className="text-muted-foreground">No coffees received yet. Share your link!</p>
-                ) : (
-                    memos.map((memo, i) => (
-                        <div key={i} className="bg-secondary/20 border border-border rounded-xl p-4 flex gap-4 items-start">
-                            <div className="bg-primary/10 p-3 rounded-full">
-                                <Coffee className="w-5 h-5 text-primary" />
-                            </div>
-                            <div className="flex-1">
-                                <div className="flex justify-between items-start">
-                                    <h4 className="font-bold">{memo.name?.trim() || 'Anonymous'}</h4>
-                                    <div className="flex flex-col items-end">
-                                        <span className="text-sm font-bold text-green-500">+{formatEther(memo.amount)} USDC</span>
-                                        <span className="text-xs text-muted-foreground">{new Date(Number(memo.timestamp) * 1000).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-                                <p className="text-sm text-muted-foreground mt-1">{memo.message?.trim() || 'No message'}</p>
-                                <p className="text-xs text-muted-foreground mt-2 font-mono">From: {memo.from.slice(0,6)}...{memo.from.slice(-4)}</p>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
-        </div>
-      </div>
-
-      <BioModal
-        isOpen={isBioModalOpen}
-        onClose={() => setIsBioModalOpen(false)}
-        initialBio={bio}
-        onSave={handleSaveBio}
-      />
     </div>
   )
 }
