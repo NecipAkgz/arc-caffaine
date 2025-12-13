@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
       encoding: "./empty.js",
     },
   },
+  output: "standalone",
   webpack: (config) => {
     config.externals.push("pino-pretty", "lokijs", "encoding");
 
