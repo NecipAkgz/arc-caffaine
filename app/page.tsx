@@ -6,6 +6,7 @@ import { useRegisterForm } from '@/hooks/useRegisterForm'
 import { Coffee, ArrowRight, Loader2, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { CustomConnectButton } from '@/components/CustomConnectButton'
+import { FadeIn, Stagger } from '@/components/animations'
 
 /**
  * Landing Page Component
@@ -40,12 +41,15 @@ export default function Home() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Hero Content */}
           <div className="space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Powered by Arc Testnet</span>
-            </div>
+            <FadeIn delay={0.2} direction="down">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Powered by Arc Testnet</span>
+              </div>
+            </FadeIn>
 
-            <div className="space-y-6">
+            <FadeIn delay={0.4} duration={1}>
+              <div className="space-y-6">
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-black tracking-tight">
                 <span className="block text-foreground">Fuel Your</span>
                 <span className="block bg-linear-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent animate-gradient">
@@ -58,10 +62,11 @@ export default function Home() {
                 <br />
                 <span className="text-foreground/80">A decentralized way for creators to receive appreciation.</span>
               </p>
-            </div>
+              </div>
+            </FadeIn>
 
             {/* Highlights */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+            <Stagger staggerDelay={0.15} initialDelay={0.6} className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
               <div className="px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                 <span className="text-sm font-medium text-foreground">⚡ Instant Transfers</span>
               </div>
@@ -71,14 +76,15 @@ export default function Home() {
               <div className="px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
                 <span className="text-sm font-medium text-foreground">🌐 Cross-Chain</span>
               </div>
-            </div>
+            </Stagger>
             {/* Features */}
 
           </div>
 
           {/* Right Side - Action Card */}
-          <div className="flex items-center justify-center">
-            <div className="w-full max-w-md">
+          <FadeIn delay={0.5} direction="left">
+            <div className="flex items-center justify-center">
+              <div className="w-full max-w-md">
               {!isConnected ? (
                 <div className="glass-card p-8 space-y-6">
                   <div className="text-center space-y-4">
@@ -176,8 +182,9 @@ export default function Home() {
                   </button>
                 </form>
               )}
+              </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </div>

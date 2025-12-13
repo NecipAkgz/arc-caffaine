@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import BioModal from '@/components/BioModal'
+import { FadeIn, Stagger } from '@/components/animations'
 
 /**
  * User Dashboard Component
@@ -137,7 +138,8 @@ export default function Dashboard() {
   return (
     <div className="w-full px-4 md:px-8 py-8">
       <div className="mx-auto space-y-8" style={{ maxWidth: '1024px' }}>
-        <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+        <FadeIn delay={0.2}>
+          <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
           <div>
               <h1 className="text-3xl font-bold">Dashboard</h1>
               <p className="text-muted-foreground">Welcome back, @{username}</p>
@@ -152,9 +154,10 @@ export default function Dashboard() {
                   <ExternalLink className="w-4 h-4" />
               </Link>
           </div>
-        </div>
+          </div>
+        </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Stagger staggerDelay={0.15} initialDelay={0.4} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Balance Card */}
           <div className="bg-secondary/30 border border-border rounded-2xl p-6 flex flex-col justify-between h-full">
               <div>
@@ -204,7 +207,7 @@ export default function Dashboard() {
                   )}
               </div>
           </div>
-        </div>
+        </Stagger>
 
         {/* History */}
         <div className="space-y-4">
