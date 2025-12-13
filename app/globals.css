@@ -34,178 +34,141 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
 
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --radius-sm: calc(var(--radius) - 2px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
+  --radius-radius: var(--radius);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Max-width definitions */
+  --max-width-5xl: 64rem;
+  --max-width-7xl: 80rem;
+}
+
+:root {
+  /* Modern Zinc Palette (Soft Dark Mode) */
+  --background: hsl(240 10% 4%);      /* #09090b - Rich minimal dark */
+  --foreground: hsl(0 0% 98%);        /* #fafafa */
+
+  --card: hsl(240 10% 6%);            /* #0e0e11 - Slightly lighter than bg */
+  --card-foreground: hsl(0 0% 98%);   /* #fafafa */
+
+  --popover: hsl(240 10% 6%);
+  --popover-foreground: hsl(0 0% 98%);
+
+  /* Refined Primary (Amber/Orange) */
+  --primary: hsl(35 90% 50%);         /* Vibrant Amber */
+  --primary-foreground: hsl(240 5.9% 10%);
+
+  --secondary: hsl(240 5% 15%);       /* Soft Gray for secondary actions */
+  --secondary-foreground: hsl(0 0% 98%);
+
+  --muted: hsl(240 5% 15%);
+  --muted-foreground: hsl(240 5% 65%);
+
+  --accent: hsl(240 5% 15%);
+  --accent-foreground: hsl(0 0% 98%);
+
+  --destructive: hsl(0 62.8% 30.6%);
+  --destructive-foreground: hsl(0 0% 98%);
+
+  --border: hsl(240 5.9% 15%);        /* Subtle border */
+  --input: hsl(240 5.9% 15%);
+  --ring: hsl(35 90% 50%);
+
+  --radius: 0.75rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-html {
-  overflow-y: auto;
-}
-
-button {
-  cursor: pointer;
-}
-
-@keyframes slideInFromTop {
-  0% {
-    opacity: 0;
-    transform: translateY(-30px) scale(0.95);
-  }
-  50% {
-    transform: translateY(-5px) scale(1.02);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.memo-slide-in {
-  animation: slideInFromTop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Custom Scrollbar - More Visible */
+/* Custom Scrollbar - Modern & Slim */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--secondary);
-  border-radius: 5px;
-  margin: 4px 0;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 5px;
-  border: 2px solid var(--secondary);
-  transition: all 0.2s;
+  background: hsl(240 5% 20%);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #fbbf24; /* Lighter amber */
-  border-width: 1px;
+  background: hsl(240 5% 30%);
 }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) var(--secondary);
-}
-
-/* Scroll Fade Indicator */
-.scroll-container {
-  position: relative;
-}
-
-.scroll-container::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to top, var(--background), transparent);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.scroll-container.has-scroll::after {
-  opacity: 1;
-}
-/* Glassmorphism Card */
+/* Glassmorphism Card (Updated for new theme) */
 .glass-card {
-  background: rgba(28, 25, 23, 0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(245, 158, 11, 0.1);
+  background: hsla(240, 10%, 6%, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid hsla(240, 5%, 80%, 0.08);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px hsla(240, 5%, 80%, 0.05) inset; /* Inner light border for depth */
 }
 
 /* Animated Gradient */
 @keyframes gradient {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient 3s ease infinite;
+  background-size: 200% auto;
+  animation: gradient 5s ease infinite;
 }
 
 /* Blob Animation */
 @keyframes blob {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
 }
 
 .animate-blob {
-  animation: blob 7s infinite;
+  animation: blob 10s infinite;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
 
 /* Slow Pulse */
 @keyframes pulse-slow {
-  0%, 100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 0.3;
-  }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.1; }
 }
 
 .animate-pulse-slow {
-  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-slow 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Gradient Mesh Background */
+/* Updated Gradient Mesh Background for new palette */
 .bg-gradient-mesh {
   background:
-    radial-gradient(at 40% 20%, rgba(245, 158, 11, 0.15) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, rgba(69, 26, 3, 0.2) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, rgba(245, 158, 11, 0.1) 0px, transparent 50%),
-    radial-gradient(at 80% 50%, rgba(69, 26, 3, 0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.1) 0px, transparent 50%),
-    radial-gradient(at 80% 100%, rgba(69, 26, 3, 0.2) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(240, 10%, 15%, 0.3) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(35, 90%, 50%, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(240, 10%, 15%, 0.3) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(35, 90%, 50%, 0.05) 0px, transparent 50%);
+  background-color: var(--background);
 }
