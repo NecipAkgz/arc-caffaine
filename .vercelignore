@@ -1,0 +1,3 @@
+# Vercel ignore file
+# Ignore server directory during frontend builds
+server/
