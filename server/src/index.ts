@@ -135,11 +135,32 @@ async function startEventListener() {
             `💬 Message: _${message || "No message"}_\n\n` +
             `View on dashboard: https://arc-caffeine.vercel.app/dashboard`;
 
-          await bot.sendMessage(data.telegram_chat_id, notificationText, {
-            parse_mode: "Markdown",
-          });
-
-          console.log(`✅ Notification sent to chat ${data.telegram_chat_id}`);
+          // Retry mechanism for network issues
+          let retries = 3;
+          while (retries > 0) {
+            try {
+              await bot.sendMessage(data.telegram_chat_id, notificationText, {
+                parse_mode: "Markdown",
+              });
+              console.log(
+                `✅ Notification sent to chat ${data.telegram_chat_id}`
+              );
+              break;
+            } catch (sendError) {
+              retries--;
+              if (retries === 0) {
+                console.error(
+                  `❌ Failed to send notification after 3 attempts:`,
+                  sendError
+                );
+              } else {
+                console.log(
+                  `⚠️ Send failed, retrying... (${retries} attempts left)`
+                );
+                await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds
+              }
+            }
+          }
         } catch (error) {
           console.error("Error processing event:", error);
         }
