@@ -22,6 +22,7 @@ import BridgeModal from "@/components/BridgeModal";
 import { ARC_TESTNET } from "@/lib/bridge-kit/chains";
 import { cn } from "@/lib/utils";
 import { FadeIn, Stagger } from "@/components/animations";
+import { Avatar } from "@/components/ui/Avatar";
 
 /**
  * Memo interface representing a donation message from the smart contract.
@@ -263,8 +264,12 @@ export default function PublicProfile() {
                 <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 <div className="relative">
-                  <div className="w-28 h-28 bg-linear-to-br from-primary/20 to-primary/5 rounded-full mx-auto flex items-center justify-center mb-6 ring-4 ring-background shadow-xl">
-                    <Coffee className="w-14 h-14 text-primary drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]" />
+                  <div className="w-28 h-28 mx-auto mb-6 ring-4 ring-background shadow-xl rounded-full overflow-hidden">
+                    <Avatar
+                      address={recipientAddress || undefined}
+                      size="xl"
+                      className="w-full h-full"
+                    />
                   </div>
                   <h1 className="text-3xl font-bold tracking-tight text-foreground">
                     @{username}
@@ -439,11 +444,7 @@ export default function PublicProfile() {
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-linear-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center border border-border/50">
-                            <span className="font-bold text-muted-foreground text-sm">
-                              {(memo.name?.trim() || "A")[0].toUpperCase()}
-                            </span>
-                          </div>
+                          <Avatar address={memo.from} size="md" />
                           <div>
                             <p className="font-bold text-foreground">
                               {memo.name?.trim() || "Anonymous"}

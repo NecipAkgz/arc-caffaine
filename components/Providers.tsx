@@ -16,15 +16,40 @@ const queryClient = new QueryClient();
  */
 export function Providers({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = React.useState<Config | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     // Load config only on client side to avoid indexedDB SSR errors
-    import("@/lib/config").then((mod) => {
-      setConfig(mod.config);
-    });
+    import("@/lib/config")
+      .then((mod) => {
+        setConfig(mod.config);
+      })
+      .catch((err) => {
+        console.error("Failed to load config:", err);
+        setError(
+          "Failed to initialize wallet configuration. Please refresh the page."
+        );
+      });
   }, []);
 
-  // Show loading skeleton until config is loaded (prevents hydration mismatch)
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state briefly
   if (!config) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">

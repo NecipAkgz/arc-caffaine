@@ -16,6 +16,7 @@ import {
   User,
   Edit,
 } from "lucide-react";
+import { Avatar } from "@/components/ui/Avatar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -317,9 +318,7 @@ export default function Dashboard() {
                     key={i}
                     className="bg-secondary/20 border border-border rounded-xl p-4 flex gap-4 items-start"
                   >
-                    <div className="bg-primary/10 p-3 rounded-full">
-                      <Coffee className="w-5 h-5 text-primary" />
-                    </div>
+                    <Avatar address={memo.from} size="md" />
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold">
