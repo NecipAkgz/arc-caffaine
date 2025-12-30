@@ -15,6 +15,7 @@ import {
   Coffee,
   User,
   Edit,
+  Bell,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import Link from "next/link";
@@ -60,6 +61,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isBioModalOpen, setIsBioModalOpen] = useState(false);
+  const [telegramConnected, setTelegramConnected] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -94,7 +96,22 @@ export default function Dashboard() {
         }
       }
     };
+
+    const checkTelegramConnection = async () => {
+      if (!address) return;
+      try {
+        const response = await fetch(
+          `/api/telegram/status?address=${address.toLowerCase()}`
+        );
+        const data = await response.json();
+        setTelegramConnected(data.connected);
+      } catch (error) {
+        console.error("Failed to check Telegram connection:", error);
+      }
+    };
+
     fetchData();
+    checkTelegramConnection();
 
     return () => {
       isMounted = false;
@@ -225,12 +242,29 @@ export default function Dashboard() {
                 <ExternalLink className="w-4 h-4" />
               </Link>
             </div>
+            {telegramConnected ? (
+              <div className="flex items-center gap-2 bg-green-600/20 border border-green-600/30 text-green-600 px-4 py-2 rounded-lg font-medium">
+                <Bell className="w-4 h-4" />
+                <span className="hidden sm:inline">Connected ✓</span>
+              </div>
+            ) : (
+              <a
+                href={`https://t.me/ArcCaffeineBot?start=${address?.toLowerCase()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 cursor-pointer"
+                title="Get notified on Telegram when you receive a coffee"
+              >
+                <Bell className="w-4 h-4" />
+                <span className="hidden sm:inline">Connect Telegram</span>
+              </a>
+            )}
           </div>
         </FadeIn>
 
         <Stagger
           staggerDelay={0.15}
-          initialDelay={0.4}
+          initialDelay={0.6}
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
           {/* Balance Card */}
@@ -257,7 +291,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Stats Card (Placeholder) */}
+          {/* Stats Card */}
           <div className="bg-secondary/30 border border-border rounded-2xl p-6">
             <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
               <Coffee className="w-5 h-5" /> Total Coffees
