@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
+import { useEffect } from "react";
+import { AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 /**
  * Error Component
@@ -13,13 +13,13 @@ export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Application error:', error)
-  }, [error])
+    console.error("Application error:", error);
+  }, [error]);
 
   return (
     <div className="flex-1 flex items-center justify-center p-4">
@@ -57,5 +57,5 @@ export default function Error({
         </div>
       </div>
     </div>
-  )
+  );
 }

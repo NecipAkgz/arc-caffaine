@@ -1,12 +1,13 @@
 import { BridgeKit } from "@circle-fin/bridge-kit";
 import { createAdapterFromProvider } from "@circle-fin/adapter-viem-v2";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   getBridgeKitChainName,
   ARC_TESTNET,
   SUPPORTED_CHAINS,
 } from "@/lib/bridge-kit/chains";
+import { logger } from "@/lib/logger";
 
 type BridgeStatus = "idle" | "bridging" | "complete" | "error";
 
@@ -44,6 +45,26 @@ export function useBridgeKit() {
 
   const kit = useMemo(() => getBridgeKitInstance(), []);
 
+  // Store event handlers in refs for cleanup
+  const eventHandlersRef = useRef<{
+    approve?: (payload: unknown) => void;
+    burn?: (payload: unknown) => void;
+    fetchAttestation?: (payload: unknown) => void;
+    mint?: (payload: unknown) => void;
+  }>({});
+
+  // Cleanup event listeners on unmount
+  useEffect(() => {
+    return () => {
+      const handlers = eventHandlersRef.current;
+      if (handlers.approve) kit.off("approve", handlers.approve);
+      if (handlers.burn) kit.off("burn", handlers.burn);
+      if (handlers.fetchAttestation)
+        kit.off("fetchAttestation", handlers.fetchAttestation);
+      if (handlers.mint) kit.off("mint", handlers.mint);
+    };
+  }, [kit]);
+
   /**
    * Initiates the bridging process to the Arc Network.
    *
@@ -71,31 +92,44 @@ export function useBridgeKit() {
           throw new Error("Chain configuration missing");
         }
 
-        // Setup Event Listeners
-        kit.on("approve", (payload) => {
-          console.log("Approval completed:", payload);
+        // Setup Event Listeners (store refs for cleanup)
+        const approveHandler = (payload: unknown) => {
+          logger.debug("Approval completed:", payload);
           setBridgeStep("burning");
-        });
+        };
 
-        kit.on("burn", (payload) => {
-          console.log("Burn completed:", payload);
+        const burnHandler = (payload: unknown) => {
+          logger.debug("Burn completed:", payload);
           setBridgeStep("attesting");
           // Extract txHash from burn event if available
-          if (payload?.values?.txHash) {
-            setTxHash(payload.values.txHash);
+          if ((payload as any)?.values?.txHash) {
+            setTxHash((payload as any).values.txHash);
           }
-        });
+        };
 
-        kit.on("fetchAttestation", (payload) => {
-          console.log("Attestation completed:", payload);
+        const attestationHandler = (payload: unknown) => {
+          logger.debug("Attestation completed:", payload);
           setBridgeStep("minting");
-        });
+        };
 
-        kit.on("mint", (payload) => {
-          console.log("Mint completed:", payload);
+        const mintHandler = (payload: unknown) => {
+          logger.debug("Mint completed:", payload);
           setBridgeStep("complete");
           setStatus("complete");
-        });
+        };
+
+        // Store handlers for cleanup
+        eventHandlersRef.current = {
+          approve: approveHandler,
+          burn: burnHandler,
+          fetchAttestation: attestationHandler,
+          mint: mintHandler,
+        };
+
+        kit.on("approve", approveHandler);
+        kit.on("burn", burnHandler);
+        kit.on("fetchAttestation", attestationHandler);
+        kit.on("mint", mintHandler);
 
         // Step 1: Prepare Adapter
         setBridgeStep("preparing");
@@ -107,7 +141,7 @@ export function useBridgeKit() {
           try {
             eip1193Provider = await connector.getProvider();
           } catch (err) {
-            console.error("Failed to get provider from connector:", err);
+            logger.error("Failed to get provider from connector:", err);
           }
         }
 
@@ -184,7 +218,7 @@ export function useBridgeKit() {
 
         return result;
       } catch (err) {
-        console.error("Bridge error:", err);
+        logger.error("Bridge error:", err);
         setStatus("error");
         setBridgeStep("idle");
         setError(err as Error);

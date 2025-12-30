@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { X } from 'lucide-react'
-import { useBridgeKit } from '@/hooks/useBridgeKit'
-import { BridgeForm } from './bridge/BridgeForm'
-import { BridgeProgress } from './bridge/BridgeProgress'
-import { BridgeComplete } from './bridge/BridgeComplete'
-import { BridgeError } from './bridge/BridgeError'
+import { useEffect } from "react";
+import { X } from "lucide-react";
+import { useBridgeKit } from "@/hooks/useBridgeKit";
+import { BridgeForm } from "./bridge/BridgeForm";
+import { BridgeProgress } from "./bridge/BridgeProgress";
+import { BridgeComplete } from "./bridge/BridgeComplete";
+import { BridgeError } from "./bridge/BridgeError";
 
 interface BridgeModalProps {
-  isOpen: boolean
-  onClose: () => void
-  amount: string
+  isOpen: boolean;
+  onClose: () => void;
+  amount: string;
 }
 
 /**
@@ -24,38 +24,50 @@ interface BridgeModalProps {
  * @param onClose - Function to close the modal.
  * @param amount - Default amount to bridge.
  */
-export default function BridgeModal({ isOpen, onClose, amount }: BridgeModalProps) {
-  const { bridgeToArc, status, bridgeStep, error, txHash, sourceChainId, reset } = useBridgeKit()
+export default function BridgeModal({
+  isOpen,
+  onClose,
+  amount,
+}: BridgeModalProps) {
+  const {
+    bridgeToArc,
+    status,
+    bridgeStep,
+    error,
+    txHash,
+    sourceChainId,
+    reset,
+  } = useBridgeKit();
 
   // Handle Escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && status !== 'bridging') {
-        handleClose()
+      if (e.key === "Escape" && status !== "bridging") {
+        handleClose();
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape)
-      return () => document.removeEventListener('keydown', handleEscape)
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
     }
-  }, [isOpen, status])
+  }, [isOpen, status]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleClose = () => {
-    if (status === 'bridging') return // Prevent closing while bridging
-    reset()
-    onClose()
-  }
+    if (status === "bridging") return; // Prevent closing while bridging
+    reset();
+    onClose();
+  };
 
   const handleBridge = async (bridgeAmount: string, selectedChain: number) => {
     try {
-      await bridgeToArc(bridgeAmount, selectedChain)
+      await bridgeToArc(bridgeAmount, selectedChain);
     } catch (err) {
-      console.error('Bridge failed:', err)
+      console.error("Bridge failed:", err);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -75,7 +87,7 @@ export default function BridgeModal({ isOpen, onClose, amount }: BridgeModalProp
           </div>
           <button
             onClick={handleClose}
-            disabled={status === 'bridging'}
+            disabled={status === "bridging"}
             className="p-2 hover:bg-white/5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-zinc-400 hover:text-white"
             aria-label="Close modal"
           >
@@ -85,15 +97,13 @@ export default function BridgeModal({ isOpen, onClose, amount }: BridgeModalProp
 
         {/* Body */}
         <div className="p-6">
-          {status === 'idle' && (
+          {status === "idle" && (
             <BridgeForm defaultAmount={amount} onBridge={handleBridge} />
           )}
 
-          {status === 'bridging' && (
-            <BridgeProgress currentStep={bridgeStep} />
-          )}
+          {status === "bridging" && <BridgeProgress currentStep={bridgeStep} />}
 
-          {status === 'complete' && (
+          {status === "complete" && (
             <BridgeComplete
               txHash={txHash ?? undefined}
               sourceChainId={sourceChainId ?? undefined}
@@ -101,11 +111,9 @@ export default function BridgeModal({ isOpen, onClose, amount }: BridgeModalProp
             />
           )}
 
-          {status === 'error' && (
-            <BridgeError error={error} onRetry={reset} />
-          )}
+          {status === "error" && <BridgeError error={error} onRetry={reset} />}
         </div>
       </div>
     </div>
-  )
+  );
 }
