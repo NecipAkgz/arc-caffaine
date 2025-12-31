@@ -23,6 +23,7 @@ import { ARC_TESTNET } from "@/lib/bridge-kit/chains";
 import { cn } from "@/lib/utils";
 import { FadeIn, Stagger } from "@/components/animations";
 import { Avatar } from "@/components/ui/Avatar";
+import { SupporterBadgeSection } from "@/components/SupporterBadgeSection";
 
 /**
  * Memo interface representing a donation message from the smart contract.
@@ -165,7 +166,7 @@ export default function PublicProfile() {
       } catch (e) {
         console.error("Failed to load profile:", e);
         if (isMounted) {
-          toast.error("Profil yüklenemedi. Lütfen tekrar deneyin.");
+          toast.error("Profile could not be uploaded. Please try again.");
         }
       } finally {
         if (isMounted) {
@@ -196,7 +197,7 @@ export default function PublicProfile() {
     // Input validation
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount < MIN_DONATION_AMOUNT) {
-      toast.error(`Minimum bağış miktarı ${MIN_DONATION_AMOUNT} USDC`);
+      toast.error(`Minimum donation amount ${MIN_DONATION_AMOUNT} USDC`);
       return;
     }
 
@@ -402,6 +403,19 @@ export default function PublicProfile() {
                 </form>
               </div>
             </FadeIn>
+
+            {/* Supporter Badge Section */}
+            {isConnected && recipientAddress && (
+              <FadeIn delay={0.5} direction="up">
+                <SupporterBadgeSection
+                  creatorAddress={recipientAddress}
+                  creatorUsername={username}
+                  hasDonated={memos.some(
+                    (memo) => memo.from.toLowerCase() === address?.toLowerCase()
+                  )}
+                />
+              </FadeIn>
+            )}
           </div>
 
           {/* RIGHT COLUMN: Feed */}
