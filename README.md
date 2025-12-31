@@ -5,10 +5,11 @@
 ## 🌟 Features
 
 - **User Profiles**: Create a unique profile with a custom username (`@username`) and bio.
+- **Creator Search** 🆕: Search for creators by username directly from the homepage or navbar.
 - **Public Pages**: Share your personalized link (e.g., `app.com/necip`) to receive support.
 - **USDC Donations**: Receive donations in USDC directly on the Arc Testnet.
 - **Telegram Notifications** 🆕: Get instant alerts on Telegram when you receive a coffee donation.
-- **Integrated Bridge**: Built-in **Circle BridgeKit** integration allows users to bridge USDC from Sepolia, Base Sepolia, and other testnets to Arc Testnet without leaving the app.
+- **Integrated Bridge** 🆕: Built-in **Circle BridgeKit** integration allows users to bridge USDC from Sepolia, Base Sepolia, and other testnets to Arc Testnet without leaving the app.
 - **Dashboard**: Track your earnings, view recent messages, withdraw funds, and connect Telegram.
 - **Responsive Design**: A modern, dark-themed UI built with Tailwind CSS that works great on all devices.
 

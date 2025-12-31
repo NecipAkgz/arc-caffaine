@@ -7,6 +7,7 @@ import { Coffee, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { CustomConnectButton } from "@/components/CustomConnectButton";
 import { FadeIn, Stagger } from "@/components/animations";
+import { CreatorSearch } from "@/components/CreatorSearch";
 
 /**
  * Landing Page Component
@@ -94,6 +95,16 @@ export default function Home() {
                 </span>
               </div>
             </Stagger>
+
+            {/* Search Bar */}
+            <FadeIn delay={0.9} direction="up">
+              <div className="flex justify-center lg:justify-start">
+                <CreatorSearch
+                  variant="hero"
+                  placeholder="Search for a creator... (e.g. neco)"
+                />
+              </div>
+            </FadeIn>
             {/* Features */}
           </div>
 
