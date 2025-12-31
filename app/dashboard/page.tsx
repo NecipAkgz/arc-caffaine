@@ -16,12 +16,15 @@ import {
   User,
   Edit,
   Bell,
+  QrCode,
+  Check,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import BioModal from "@/components/BioModal";
+import QRCodeModal from "@/components/QRCodeModal";
 import { FadeIn, Stagger } from "@/components/animations";
 import { Memo } from "@/lib/types";
 import { logger } from "@/lib/logger";
@@ -61,6 +64,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isBioModalOpen, setIsBioModalOpen] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [telegramConnected, setTelegramConnected] = useState(false);
 
   useEffect(() => {
@@ -223,16 +227,28 @@ export default function Dashboard() {
               </code>
               <button
                 onClick={handleCopy}
-                className="p-2 hover:bg-background rounded transition cursor-pointer"
+                className={`p-2 rounded transition cursor-pointer flex items-center gap-1 ${
+                  copied
+                    ? "bg-green-500/20 text-green-500"
+                    : "hover:bg-background"
+                }`}
                 title="Copy Link"
               >
                 {copied ? (
-                  <span className="text-green-500 text-xs font-bold">
-                    Copied!
-                  </span>
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span className="text-xs font-medium">Copied!</span>
+                  </>
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
+              </button>
+              <button
+                onClick={() => setIsQRModalOpen(true)}
+                className="p-2 hover:bg-background rounded transition cursor-pointer"
+                title="Show QR Code"
+              >
+                <QrCode className="w-4 h-4" />
               </button>
               <Link
                 href={`/${username}`}
@@ -388,6 +404,13 @@ export default function Dashboard() {
           onClose={() => setIsBioModalOpen(false)}
           initialBio={bio}
           onSave={handleSaveBio}
+        />
+
+        <QRCodeModal
+          isOpen={isQRModalOpen}
+          onClose={() => setIsQRModalOpen(false)}
+          profileUrl={username ? `${window.location.origin}/${username}` : ""}
+          username={username || ""}
         />
       </div>
     </div>
