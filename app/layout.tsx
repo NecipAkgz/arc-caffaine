@@ -8,11 +8,58 @@ import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
+const siteConfig = {
+  title: "ArcCaffeine",
+  description:
+    "Support creators with crypto coffee donations on Arc Testnet. Decentralized, transparent, and instant.",
+  url: "https://arccaffaine.vercel.app/",
+  ogImage: "/og-image.png",
+};
+
 export const metadata: Metadata = {
-  title: "ArcCaffeine - Buy Me a Coffee on Arc",
-  description: "Decentralized donations on Arc Testnet",
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.title}`,
+  },
+  description: siteConfig.description,
   icons: {
     icon: "/icon.svg",
+    apple: "/arc-icon.png",
+  },
+  metadataBase: new URL(siteConfig.url),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    siteName: siteConfig.title,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: "ArcCaffeine - Crypto Coffee Donations",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+    creator: "@arccaffeine",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Coffee Cup Body -->
+  <path d="M6 12h16v12a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4V12z" fill="#f59e0b"/>
+
+  <!-- Cup Handle -->
+  <path d="M22 14h2a3 3 0 0 1 0 6h-2" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Steam Lines -->
+  <path d="M10 8c0-2 2-2 2-4" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M14 6c0-2 2-2 2-4" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M18 8c0-2 2-2 2-4" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+</svg>
