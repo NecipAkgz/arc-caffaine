@@ -18,15 +18,13 @@ import { decodeEventLog } from "viem";
 interface SupporterBadgeSectionProps {
   creatorAddress: `0x${string}`;
   creatorUsername: string;
-  /** Whether the connected user has donated to this creator */
   hasDonated: boolean;
 }
 
 /**
  * SupporterBadgeSection Component
  *
- * Displays claim button and success modal with real on-chain NFT.
- * Only shows if user has donated to the creator.
+ * Compact horizontal bar for claiming supporter NFT badges.
  */
 export function SupporterBadgeSection({
   creatorAddress,
@@ -166,21 +164,9 @@ export function SupporterBadgeSection({
   // Already has badge (not during claim flow)
   if (hasClaimed && !isConfirmed) {
     return (
-      <div className="glass-card p-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center text-4xl">
-            ☕
-          </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-foreground flex items-center gap-2">
-              Supporter Badge
-              <Check className="w-4 h-4 text-green-500" />
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              You have this creator&apos;s supporter badge!
-            </p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center gap-2 py-3 text-green-500">
+        <Check className="w-4 h-4" />
+        <span className="text-sm font-medium">NFT Badge Claimed</span>
       </div>
     );
   }
@@ -250,56 +236,37 @@ export function SupporterBadgeSection({
           document.body
         )}
 
-      {/* Badge Section */}
-      <div className="glass-card p-6">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  hasDonated
-                    ? "bg-linear-to-br from-purple-500/20 to-orange-500/20"
-                    : "bg-secondary/50"
-                }`}
-              >
-                <Award
-                  className={`w-6 h-6 ${
-                    hasDonated ? "text-primary" : "text-muted-foreground"
-                  }`}
-                />
-              </div>
-              <div>
-                <h3 className="font-bold text-foreground">Supporter Badge</h3>
-                <p className="text-sm text-muted-foreground">
-                  {hasDonated
-                    ? "Claim your on-chain badge!"
-                    : "Support to unlock"}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleClaim}
-              disabled={!hasDonated || isClaimPending || isConfirming}
-              className="bg-linear-to-br from-purple-500 to-orange-500 hover:from-purple-600 hover:to-orange-600 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-sm"
-            >
-              {isClaimPending || isConfirming ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <>
-                  <Award className="w-4 h-4" />
-                  Claim
-                </>
-              )}
-            </button>
+      {/* Badge Bar */}
+      <div className="rounded-2xl overflow-hidden bg-linear-to-r from-purple-500/60 via-purple-500/40 to-orange-500/60 p-px">
+        <div className="flex items-center gap-4 px-5 py-3.5 rounded-[15px] bg-[#0c0c14]">
+          {/* Left: Icon */}
+          <span className="text-2xl shrink-0">🏆</span>
+
+          {/* Center: Text */}
+          <div className="flex-1 flex flex-col items-center text-center">
+            <span className="font-semibold text-foreground text-sm">
+              Supporter NFT Badge
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {hasDonated ? "Claim your NFT" : "Buy a coffee to unlock"}
+            </span>
           </div>
 
-          {/* Info message when not donated */}
-          {!hasDonated && (
-            <p className="text-xs text-muted-foreground bg-secondary/30 px-3 py-2 rounded-lg">
-              ☕ Buy a coffee to claim your exclusive supporter NFT badge on
-              ARC!
-            </p>
-          )}
+          {/* Right: Button */}
+          <button
+            onClick={handleClaim}
+            disabled={!hasDonated || isClaimPending || isConfirming}
+            className="shrink-0 bg-linear-to-r from-purple-500 to-orange-500 hover:from-purple-600 hover:to-orange-600 text-white px-4 py-2 rounded-xl font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-sm"
+          >
+            {isClaimPending || isConfirming ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Award className="w-4 h-4" />
+                Claim
+              </>
+            )}
+          </button>
         </div>
       </div>
     </>

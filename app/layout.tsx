@@ -23,13 +23,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
+      <body
+        className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
+      >
         <Providers>
           <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-1 flex flex-col">
-              {children}
-            </main>
+            <main className="flex-1 flex flex-col">{children}</main>
             <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground bg-secondary/30">
               <p>Built with ☕️ on Arc Testnet</p>
             </footer>

@@ -251,7 +251,7 @@ export default function PublicProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 overflow-x-hidden">
+    <div className="flex-1 bg-background text-foreground selection:bg-primary/20 overflow-x-hidden">
       {/* Background Gradient */}
       <div className="fixed inset-0 bg-gradient-mesh pointer-events-none -z-10" />
 
@@ -259,26 +259,48 @@ export default function PublicProfile() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* LEFT COLUMN: Profile & Donation (Sticky on Desktop) */}
           <div className="lg:col-span-5 lg:sticky lg:top-8 space-y-6">
-            {/* Profile Card */}
+            {/* Profile Card with Badge */}
             <FadeIn delay={0.2} direction="down">
-              <div className="glass-card p-8 text-center shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                <div className="relative">
-                  <div className="w-28 h-28 mx-auto mb-6 ring-4 ring-background shadow-xl rounded-full overflow-hidden">
+              <div className="relative pt-14">
+                {/* Avatar - Overflowing top */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10">
+                  <div className="w-24 h-24 shadow-xl rounded-full overflow-hidden bg-background">
                     <Avatar
                       address={recipientAddress || undefined}
                       size="xl"
                       className="w-full h-full"
                     />
                   </div>
-                  <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                    @{username}
-                  </h1>
-                  {bio && (
-                    <p className="text-muted-foreground mt-3 leading-relaxed">
-                      {bio}
-                    </p>
+                </div>
+
+                {/* Card Body */}
+                <div className="glass-card overflow-hidden shadow-2xl relative group">
+                  <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                  {/* Content */}
+                  <div className="relative pt-16 pb-6 px-8 text-center">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                      @{username}
+                    </h1>
+                    {bio && (
+                      <p className="text-muted-foreground mt-3 leading-relaxed">
+                        {bio}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Badge Section - Full Width Bottom */}
+                  {isConnected && recipientAddress && (
+                    <div className="px-4 pb-4">
+                      <SupporterBadgeSection
+                        creatorAddress={recipientAddress}
+                        creatorUsername={username}
+                        hasDonated={memos.some(
+                          (memo) =>
+                            memo.from.toLowerCase() === address?.toLowerCase()
+                        )}
+                      />
+                    </div>
                   )}
                 </div>
               </div>
@@ -403,23 +425,10 @@ export default function PublicProfile() {
                 </form>
               </div>
             </FadeIn>
-
-            {/* Supporter Badge Section */}
-            {isConnected && recipientAddress && (
-              <FadeIn delay={0.5} direction="up">
-                <SupporterBadgeSection
-                  creatorAddress={recipientAddress}
-                  creatorUsername={username}
-                  hasDonated={memos.some(
-                    (memo) => memo.from.toLowerCase() === address?.toLowerCase()
-                  )}
-                />
-              </FadeIn>
-            )}
           </div>
 
           {/* RIGHT COLUMN: Feed */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-6 lg:-mt-12 lg:pt-14">
             <FadeIn delay={0.6} direction="left">
               <div className="flex items-center justify-between px-2">
                 <h3 className="text-xl font-bold flex items-center gap-2 text-foreground">
