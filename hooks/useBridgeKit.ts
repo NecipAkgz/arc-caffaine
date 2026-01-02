@@ -2,10 +2,12 @@ import { BridgeKit } from "@circle-fin/bridge-kit";
 import { createAdapterFromProvider } from "@circle-fin/adapter-viem-v2";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { createPublicClient, http } from "viem";
 import {
   getBridgeKitChainName,
   ARC_TESTNET,
   SUPPORTED_CHAINS,
+  getBestRpcUrl,
 } from "@/lib/bridge-kit/chains";
 import { logger } from "@/lib/logger";
 
@@ -114,6 +116,10 @@ export function useBridgeKit() {
 
         const mintHandler = (payload: unknown) => {
           logger.debug("Mint completed:", payload);
+          // Extract txHash from mint event if available (Arc Mint Tx)
+          if ((payload as any)?.values?.txHash) {
+            setTxHash((payload as any).values.txHash);
+          }
           setBridgeStep("complete");
           setStatus("complete");
         };
@@ -160,9 +166,23 @@ export function useBridgeKit() {
           );
         }
 
-        // Create adapter with provider object
+        // Create adapter with provider object and optimized RPC support
         const adapter = await createAdapterFromProvider({
           provider: eip1193Provider,
+          getPublicClient: ({ chain }) => {
+            const rpcUrl = getBestRpcUrl(chain.id);
+            return createPublicClient({
+              chain,
+              transport: http(rpcUrl, {
+                retryCount: 5, // More retries for public RPCs
+                timeout: 10000, // Faster failure/retry
+              }),
+              pollingInterval: 2000,
+              batch: {
+                multicall: true,
+              },
+            });
+          },
         });
 
         const sourceChain = getBridgeKitChainName(sourceChainId);

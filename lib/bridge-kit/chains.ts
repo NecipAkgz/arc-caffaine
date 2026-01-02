@@ -7,6 +7,8 @@ export type Chain = {
   usdcAddress?: string;
   explorerUrl: string;
   isDestination?: boolean;
+  rpcUrl?: string;
+  alchemyHost?: string;
 };
 
 export const SUPPORTED_CHAINS: Chain[] = [
@@ -18,6 +20,8 @@ export const SUPPORTED_CHAINS: Chain[] = [
     nativeCurrency: "ETH",
     usdcAddress: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238", // USDC on Sepolia
     explorerUrl: "https://sepolia.etherscan.io",
+    rpcUrl: "https://rpc.ankr.com/eth_sepolia",
+    alchemyHost: "eth-sepolia.g.alchemy.com",
   },
   {
     id: 84532,
@@ -27,6 +31,8 @@ export const SUPPORTED_CHAINS: Chain[] = [
     nativeCurrency: "ETH",
     usdcAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", // USDC on Base Sepolia
     explorerUrl: "https://sepolia.basescan.org",
+    rpcUrl: "https://sepolia.base.org",
+    alchemyHost: "base-sepolia.g.alchemy.com",
   },
   {
     id: 1301,
@@ -36,6 +42,8 @@ export const SUPPORTED_CHAINS: Chain[] = [
     nativeCurrency: "ETH",
     usdcAddress: "0x31d0220469e10c4E71834a79b1f276d740d3768F", // USDC on Unichain Sepolia
     explorerUrl: "https://sepolia.uniscan.xyz",
+    rpcUrl: "https://sepolia.unichain.org",
+    alchemyHost: "unichain-sepolia.g.alchemy.com",
   },
   {
     id: 5042002, // Arc Testnet
@@ -62,4 +70,16 @@ export function getBridgeKitChainName(chainId: number) {
 export function isBridgeSupported(chainId: number) {
   const chain = getChainByWagmiId(chainId);
   return chain && !chain.isDestination;
+}
+
+export function getBestRpcUrl(chainId: number) {
+  const chain = getChainByWagmiId(chainId);
+  if (!chain || chain.id === ARC_TESTNET.id) return undefined;
+
+  const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+  if (alchemyKey && chain.alchemyHost) {
+    return `https://${chain.alchemyHost}/v2/${alchemyKey}`;
+  }
+
+  return chain.rpcUrl;
 }

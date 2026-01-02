@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, ExternalLink, Sparkles } from "lucide-react";
-import { getChainByWagmiId } from "@/lib/bridge-kit/chains";
+import { ARC_TESTNET } from "@/lib/bridge-kit/chains";
 
 interface BridgeCompleteProps {
   txHash?: string;
@@ -14,14 +14,8 @@ interface BridgeCompleteProps {
  *
  * Displays success message with elegant animation and transaction details.
  */
-export function BridgeComplete({
-  txHash,
-  sourceChainId,
-  onClose,
-}: BridgeCompleteProps) {
-  // Get the source chain's explorer URL
-  const sourceChain = sourceChainId ? getChainByWagmiId(sourceChainId) : null;
-  const explorerUrl = sourceChain?.explorerUrl || "https://testnet.arcscan.app";
+export function BridgeComplete({ txHash, onClose }: BridgeCompleteProps) {
+  const explorerUrl = ARC_TESTNET.explorerUrl;
 
   return (
     <div className="text-center py-6 relative">

@@ -72,7 +72,7 @@ export function BridgeProgress({
         <BridgeStepItem
           step="attesting"
           currentStep={currentStep}
-          label="Attestation"
+          label="Attestation (It can take 15 seconds)"
           description="Verifying cross-chain message"
         />
         <BridgeStepItem
