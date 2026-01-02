@@ -1,162 +1,136 @@
-# ArcCaffeine ☕️
+<div align="center">
+  <h1>ArcCaffeine ☕️</h1>
 
-**ArcCaffeine** is a decentralized "Buy Me a Coffee" platform built on the **Arc Blockchain Testnet**. It empowers creators to receive support in **USDC** directly from their fans, with a seamless user experience that includes profile customization, cross-chain bridge, and **real-time Telegram notifications**.
+  <p>
+    <strong>The Decentralized "Buy Me a Coffee" Platform for the Arc Ecosystem</strong>
+  </p>
 
-## 🌟 Features
+  <a href="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=0EA5E9&center=true&vCenter=true&width=500&lines=Decentralized+Support+in+USDC;Seamless+Cross-Chain+Bridge;Real-time+Telegram+Alerts;Built+on+Arc+Testnet">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=0EA5E9&center=true&vCenter=true&width=500&lines=Decentralized+Support+in+USDC;Seamless+Cross-Chain+Bridge;Real-time+Telegram+Alerts;Built+on+Arc+Testnet" alt="Typing SVG" />
+  </a>
 
-- **User Profiles**: Create a unique profile with a custom username (`@username`) and bio.
-- **Creator Search** 🆕: Search for creators by username directly from the homepage or navbar.
-- **Public Pages**: Share your personalized link (e.g., `app.com/necip`) to receive support.
-- **USDC Donations**: Receive donations in USDC directly on the Arc Testnet.
-- **Telegram Notifications** 🆕: Get instant alerts on Telegram when you receive a coffee donation.
-- **Integrated Bridge** 🆕: Built-in **Circle BridgeKit** integration allows users to bridge USDC from Sepolia, Base Sepolia, and other testnets to Arc Testnet without leaving the app.
-- **Dashboard**: Track your earnings, view recent messages, withdraw funds, and connect Telegram.
-- **Responsive Design**: A modern, dark-themed UI built with Tailwind CSS that works great on all devices.
-
-## 🛠 Tech Stack
-
-### Frontend
-- [Next.js 15](https://nextjs.org/) (App Router)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Wagmi](https://wagmi.sh/) & [Viem](https://viem.sh/)
-- [RainbowKit](https://www.rainbowkit.com/)
-- [Circle BridgeKit](https://developers.circle.com/w3s/bridge-kit)
-
-### Backend (Notification Server)
-- [Node.js](https://nodejs.org/) + TypeScript
-- [Telegram Bot API](https://core.telegram.org/bots/api)
-- [Supabase](https://supabase.com/) (Database)
-- [Viem](https://viem.sh/) (Blockchain event listener)
-
-### Smart Contract
-- Solidity (Deployed on Arc Testnet)
-
-## 🔗 Smart Contract
-
-The ArcCaffeine smart contract handles user registration, donations, and withdrawals.
-
-- **Contract Address**: [`0xcC7F8BD425265EA2619B0876B76487B824D57c2d`](https://testnet.arcscan.app/address/0xcC7F8BD425265EA2619B0876B76487B824D57c2d)
-- **Network**: Arc Testnet
-
-## 🚀 Getting Started
-
-### Frontend Setup
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/NecipAkgz/arc-caffaine.git
-   cd arc-caffaine
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment:**
-
-   Create `.env.local`:
-   ```env
-   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-
-4. **Run the development server:**
-
-   ```bash
-   npm run dev
-   ```
-
-5. **Open the app:**
-
-   Visit [http://localhost:3000](http://localhost:3000)
-
-### Notification Server Setup (Optional)
-
-For Telegram notifications, set up the notification server:
-
-1. **Navigate to server directory:**
-
-   ```bash
-   cd server
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment:**
-
-   Create `server/.env`:
-   ```env
-   TELEGRAM_BOT_TOKEN=your_bot_token
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-
-4. **Run the server:**
-
-   ```bash
-   npm run dev
-   ```
-
-For production deployment, see [server/README.md](server/README.md)
-
-## 📖 Usage
-
-1. **Connect Wallet**: Connect your wallet using RainbowKit.
-2. **Create Profile**: Enter a username and bio to register on-chain.
-3. **Connect Telegram** 🆕: Click "Connect Telegram" on dashboard to receive notifications.
-4. **Share Link**: Send your profile link to supporters.
-5. **Receive Support**: Supporters can send USDC. If they don't have USDC on Arc, they can use the "Bridge Funds" button.
-6. **Get Notified**: Receive instant Telegram alerts when someone buys you a coffee! ☕
-7. **Withdraw**: Go to your dashboard to withdraw your earnings.
-
-## 🔔 Telegram Notifications
-
-ArcCaffeine includes a real-time notification system:
-
-- **Instant Alerts**: Get notified immediately when you receive a donation
-- **Rich Messages**: See donor name, amount, and message
-- **Easy Setup**: One-click connection via deep linking
-- **Status Display**: Dashboard shows connection status
-
-### How It Works
-
-1. Click "Connect Telegram" on dashboard
-2. Authorize the bot with your wallet address
-3. Receive notifications when donations arrive
-4. View donation details directly in Telegram
-
-## 📁 Project Structure
-
-```
-arc-caffaine/
-├── app/                    # Next.js app directory
-│   ├── dashboard/         # User dashboard
-│   ├── [username]/        # Public profile pages
-│   └── api/               # API routes
-├── components/            # React components
-├── hooks/                 # Custom React hooks
-├── lib/                   # Utilities and config
-├── server/                # Notification server
-│   ├── src/
-│   │   ├── index.ts      # Main server
-│   │   ├── chain.ts      # Arc Testnet config
-│   │   └── abi.ts        # Contract ABI
-│   └── supabase-schema.sql
-└── hardhat-project/       # Smart contracts
-```
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+  <p>
+    <a href="https://testnet.arcscan.app/address/0xcC7F8BD425265EA2619B0876B76487B824D57c2d"><img src="https://img.shields.io/badge/Network-Arc_Testnet-0EA5E9?style=for-the-badge&logo=squarespace&logoColor=white" alt="Arc Testnet" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Status-Active-22C55E?style=for-the-badge&logo=activity&logoColor=white" alt="Status Active" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-A855F7?style=for-the-badge&logo=basecamp&logoColor=white" alt="License MIT" /></a>
+  </p>
+</div>
 
 ---
 
-Built with ❤️ on Arc Testnet
+## ▸ About
+
+**ArcCaffeine** empowers creators to receive support in **USDC** directly from their fans on the Arc Blockchain Testnet. With a seamless user experience, it combines profile customization, a built-in cross-chain bridge, and instant Telegram notifications to keep you connected with your supporters.
+
+---
+
+## ▸ Key Features
+
+### ✨ Core Experience
+- **Unique User Profiles** → Create your custom `@username` identity.
+- **Direct USDC Support** → Receive donations instantly with low fees.
+- **Creator Search** → Easily discover creators via the dashboard.
+
+### ⚡ Power Tools
+- **Integrated Bridge** → Built-in **Circle BridgeKit** allows users to bridge USDC from Sepolia, Base Sepolia, and other testnets without leaving the app.
+- **Telegram Sentinel** → Get real-time alerts for every coffee bought.
+- **Dashboard Analytics** → Track earnings and manage withdrawals throughout.
+
+---
+
+## ▸ Tech Stack
+
+<div align="left">
+  <img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,supabase,nodejs,solidity,hardhat&theme=dark" alt="Tech Stack" />
+</div>
+
+### 🎨 Frontend
+- **Framework:** Next.js 15 (App Router)
+- **Styling:** Tailwind CSS (Premium Dark Mode)
+- **Web3:** Wagmi, Viem, RainbowKit
+
+### ⚙️ Backend
+- **Server:** Node.js + TypeScript
+- **Database:** Supabase
+- **Notifications:** Telegram Bot API
+- **Events:** Viem (Blockchain Listener)
+
+---
+
+## ▸ Smart Contract
+
+The backbone of ArcCaffeine, handling decentralized registration and payments.
+
+> **Contract Address:** [`0xcC7F8BD425265EA2619B0876B76487B824D57c2d`](https://testnet.arcscan.app/address/0xcC7F8BD425265EA2619B0876B76487B824D57c2d)
+
+---
+
+## ▸ Workflow & Notifications
+
+### 📖 User Journey
+1. **Connect & Create** → Connect wallet (RainbowKit) and register your unique `@username`.
+2. **Sentinel Setup** 🆕 → Click **"Connect Telegram"** on the dashboard to link your account.
+3. **Share & Receive** → Share your profile link. Supporters send USDC (via Arc or Bridge).
+4. **Instant Alerts** 🔔 → Get real-time Telegram notifications with donor name, amount, and message.
+5. **Withdraw** → Claim your earnings directly from the dashboard.
+
+### 🔔 Telegram Sentinel
+**ArcCaffeine** features a premium real-time notification system.
+- **Instant Alerts** → Zero-latency notifications for every donation.
+- **Rich Context** → View donor identity, amount, and personal messages.
+- **Dashboard Integration** → Live status indicator and one-click deep link setup.
+
+---
+
+## ▸ Quick Start
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/NecipAkgz/arc-caffaine.git
+cd arc-caffaine
+npm install
+```
+
+### 2. Configure Environment
+
+Create a `.env.local` file in the root directory:
+
+```env
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_id
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+```
+
+### 3. Launch
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the app in action.
+
+### 4. Notification Server (Optional)
+For setting up the Telegram notification bot, please refer to the [Notification Server Documentation](server/README.md).
+
+---
+
+## ▸ Project Structure
+
+```
+arc-caffaine/
+├── app/                  # Next.js App Router
+├── components/           # UI Components
+├── hooks/                # Custom Web3 Hooks
+├── lib/                  # Utilities
+├── server/               # Notification Service
+└── hardhat-project/      # Smart Contracts
+```
+
+---
+
+<div align="center">
+  <p>
+    Built with ❤️ by <a href="https://github.com/NecipAkgz">Necip Akgz</a>
+  </p>
+</div>

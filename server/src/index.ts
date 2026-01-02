@@ -81,7 +81,7 @@ bot.onText(/\/start$/, (msg) => {
     chatId,
     "👋 Welcome to ArcCaffeine Bot!\n\n" +
       "To receive donation notifications, please use the 'Connect Telegram' button from your ArcCaffeine dashboard.\n\n" +
-      "Visit: https://arc-caffeine.vercel.app/dashboard"
+      "Visit: https://arccaffaine.vercel.app/dashboard"
   );
 });
 

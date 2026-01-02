@@ -1,57 +1,85 @@
-# ArcCaffeine Notification Server
+<div align="center">
+  <img src="https://img.icons8.com/fluency/96/console.png" alt="Server Logo" width="100"/>
+  <br />
+  <h1>ArcCaffeine Notification Server</h1>
 
-Telegram bot and blockchain event listener for sending donation notifications.
+  <p>
+    <strong>The Real-Time Neural Link for ArcCaffeine Notifications</strong>
+  </p>
 
-## Setup
+  <p>
+    <a href="#"><img src="https://img.shields.io/badge/Service-Telegram_Bot-0EA5E9?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram Bot" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Status-Online-22C55E?style=for-the-badge&logo=activity&logoColor=white" alt="Status Online" /></a>
+    <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-A855F7?style=for-the-badge&logo=basecamp&logoColor=white" alt="License MIT" /></a>
+  </p>
+</div>
 
-1. **Set up Supabase database:**
-   - Go to your Supabase dashboard
-   - Open SQL Editor
-   - Run the `supabase-schema.sql` file in this directory
-   - Copy your Project URL and anon key from Settings → API
+---
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+## ▸ Overview
 
-3. **Configure environment:**
-   - Copy `.env.example` to `.env`
-   - Fill in your Supabase credentials
-   - Bot token is already configured
+The **Notification Server** operates as the bridge between on-chain events and off-chain user alerts. It listens for `NewMemo` events on the Arc Testnet and instantly forwards them to creators via Telegram.
 
-4. **Run locally:**
-   ```bash
-   npm run dev
-   ```
+---
 
-5. **Build for production:**
-   ```bash
-   npm run build
-   npm start
-   ```
+## ▸ Architecture
 
-## Deployment (Render)
+### 🔄 Data Flow
+1. **Bot Linking** → Users authenticate via Deep Link (`/start <wallet>`) → Server maps Wallet ↔ Chat ID in Supabase.
+2. **Event Sentinel** → Viem watcher monitors Arc Testnet for `NewMemo` logs.
+3. **Dispatch** → On event detection, server queries Supabase for the recipient and fires a Telegram message.
 
-1. Create a new **Web Service** on Render
-2. Connect your GitHub repository
-3. Set the following:
-   - **Root Directory:** `server`
-   - **Build Command:** `npm install && npm run build`
-   - **Start Command:** `npm start`
-4. Add environment variables in Render dashboard:
-   - `TELEGRAM_BOT_TOKEN`
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
+---
 
-## How It Works
+## ▸ Infrastructure
 
-1. **Bot Linking:** Users click "Connect Telegram" on dashboard → Opens bot with deep link → Bot saves wallet-to-chat mapping in Supabase
-2. **Event Listening:** Server watches Arc Testnet for `NewMemo` events
-3. **Notifications:** When donation detected → Lookup recipient's Telegram → Send notification
+<div align="left">
+  <img src="https://skillicons.dev/icons?i=nodejs,ts,supabase,docker&theme=dark" alt="Server Stack" />
+  <br />
+  <br />
+</div>
 
-## Environment Variables
+- **Runtime:** Node.js + TypeScript
+- **Database:** Supabase (PostgreSQL)
+- **Blockchain:** Viem (Event Listening)
+- **Deployment:** Render / Docker
 
-- `TELEGRAM_BOT_TOKEN`: Your Telegram bot token from @BotFather
-- `SUPABASE_URL`: Your Supabase project URL
-- `SUPABASE_ANON_KEY`: Your Supabase anonymous key
+---
+
+## ▸ Setup Guide
+
+### 1. Database Initialization
+- Access your **Supabase Dashboard**.
+- Open the SQL Editor.
+- Execute the contents of `supabase-schema.sql`.
+- Retrieve your **Project URL** and **Anon Key**.
+
+### 2. Installation
+```bash
+npm install
+```
+
+### 3. Environment Configuration
+Create a `.env` file based on `.env.example`:
+
+```env
+TELEGRAM_BOT_TOKEN=your_token
+SUPABASE_URL=your_url
+SUPABASE_ANON_KEY=your_key
+```
+
+### 4. Ignite
+```bash
+npm run dev
+```
+
+---
+
+## ▸ Deployment (Render)
+
+1. **New Web Service** → Connect your repo.
+2. **Settings:**
+    - Root Directory: `server`
+    - Build Command: `npm install && npm run build`
+    - Start Command: `npm start`
+3. **Variables:** Add your configured environment variables.
