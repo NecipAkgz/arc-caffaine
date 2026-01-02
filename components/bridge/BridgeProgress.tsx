@@ -1,30 +1,56 @@
-'use client'
+"use client";
 
-import { ChainIcon } from '@/components/ChainIcon'
-import { BridgeStepItem } from './BridgeStepItem'
+import { BridgeStepItem } from "./BridgeStepItem";
+import { PortalAnimation } from "./PortalAnimation";
 
 interface BridgeProgressProps {
-  currentStep: string
+  currentStep: string;
+  sourceChainId?: number;
 }
+
+type BridgeStep =
+  | "preparing"
+  | "approving"
+  | "burning"
+  | "attesting"
+  | "minting"
+  | "complete";
 
 /**
  * Bridge Progress Component
  *
- * Displays the current progress of a bridge transaction with step-by-step status.
+ * Displays the current progress of a bridge transaction with step-by-step status
+ * and an animated portal visualization.
  */
-export function BridgeProgress({ currentStep }: BridgeProgressProps) {
+export function BridgeProgress({
+  currentStep,
+  sourceChainId,
+}: BridgeProgressProps) {
   return (
-    <div className="py-2">
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 relative">
-          <div className="absolute inset-0 rounded-full border-t-2 border-primary animate-spin" />
-          <ChainIcon name="arc" size={32} />
+    <div className="py-2 space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+          <span className="text-sm font-medium text-primary">
+            Transaction in Progress
+          </span>
         </div>
-        <h3 className="text-lg font-bold text-white">Bridging in Progress</h3>
-        <p className="text-sm text-zinc-500 mt-1">Please keep this window open</p>
+        <h3 className="text-xl font-bold text-white">Bridging to Arc</h3>
+        <p className="text-sm text-zinc-500 mt-1">
+          Please keep this window open
+        </p>
       </div>
 
-      <div className="space-y-0 pl-4">
+      {/* Portal Animation */}
+      <PortalAnimation
+        currentStep={currentStep as BridgeStep}
+        sourceChainId={sourceChainId}
+        className="my-6"
+      />
+
+      {/* Step List */}
+      <div className="space-y-0 pl-4 pt-2">
         <BridgeStepItem
           step="preparing"
           currentStep={currentStep}
@@ -58,5 +84,5 @@ export function BridgeProgress({ currentStep }: BridgeProgressProps) {
         />
       </div>
     </div>
-  )
+  );
 }

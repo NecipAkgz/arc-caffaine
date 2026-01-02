@@ -101,7 +101,12 @@ export default function BridgeModal({
             <BridgeForm defaultAmount={amount} onBridge={handleBridge} />
           )}
 
-          {status === "bridging" && <BridgeProgress currentStep={bridgeStep} />}
+          {status === "bridging" && (
+            <BridgeProgress
+              currentStep={bridgeStep}
+              sourceChainId={sourceChainId ?? undefined}
+            />
+          )}
 
           {status === "complete" && (
             <BridgeComplete

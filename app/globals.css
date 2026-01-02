@@ -56,20 +56,20 @@
 
 :root {
   /* Modern Zinc Palette (Soft Dark Mode) */
-  --background: hsl(240 10% 4%);      /* #09090b - Rich minimal dark */
-  --foreground: hsl(0 0% 98%);        /* #fafafa */
+  --background: hsl(240 10% 4%); /* #09090b - Rich minimal dark */
+  --foreground: hsl(0 0% 98%); /* #fafafa */
 
-  --card: hsl(240 10% 6%);            /* #0e0e11 - Slightly lighter than bg */
-  --card-foreground: hsl(0 0% 98%);   /* #fafafa */
+  --card: hsl(240 10% 6%); /* #0e0e11 - Slightly lighter than bg */
+  --card-foreground: hsl(0 0% 98%); /* #fafafa */
 
   --popover: hsl(240 10% 6%);
   --popover-foreground: hsl(0 0% 98%);
 
   /* Refined Primary (Amber/Orange) */
-  --primary: hsl(35 90% 50%);         /* Vibrant Amber */
+  --primary: hsl(35 90% 50%); /* Vibrant Amber */
   --primary-foreground: hsl(240 5.9% 10%);
 
-  --secondary: hsl(240 5% 15%);       /* Soft Gray for secondary actions */
+  --secondary: hsl(240 5% 15%); /* Soft Gray for secondary actions */
   --secondary-foreground: hsl(0 0% 98%);
 
   --muted: hsl(240 5% 15%);
@@ -81,7 +81,7 @@
   --destructive: hsl(0 62.8% 30.6%);
   --destructive-foreground: hsl(0 0% 98%);
 
-  --border: hsl(240 5.9% 15%);        /* Subtle border */
+  --border: hsl(240 5.9% 15%); /* Subtle border */
   --input: hsl(240 5.9% 15%);
   --ring: hsl(35 90% 50%);
 
@@ -121,17 +121,21 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid hsla(240, 5%, 80%, 0.08);
   border-radius: 1.5rem;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    0 0 0 1px hsla(240, 5%, 80%, 0.05) inset; /* Inner light border for depth */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 0 0 1px hsla(240, 5%, 80%, 0.05) inset; /* Inner light border for depth */
 }
 
 /* Animated Gradient */
 @keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .animate-gradient {
@@ -141,22 +145,38 @@ body {
 
 /* Blob Animation */
 @keyframes blob {
-  0%, 100% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
 }
 
 .animate-blob {
   animation: blob 10s infinite;
 }
 
-.animation-delay-2000 { animation-delay: 2s; }
-.animation-delay-4000 { animation-delay: 4s; }
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
 
 /* Slow Pulse */
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.1; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.1;
+  }
 }
 
 .animate-pulse-slow {
@@ -165,10 +185,245 @@ body {
 
 /* Updated Gradient Mesh Background for new palette */
 .bg-gradient-mesh {
-  background:
-    radial-gradient(at 0% 0%, hsla(240, 10%, 15%, 0.3) 0px, transparent 50%),
+  background: radial-gradient(
+      at 0% 0%,
+      hsla(240, 10%, 15%, 0.3) 0px,
+      transparent 50%
+    ),
     radial-gradient(at 100% 0%, hsla(35, 90%, 50%, 0.08) 0px, transparent 50%),
     radial-gradient(at 100% 100%, hsla(240, 10%, 15%, 0.3) 0px, transparent 50%),
     radial-gradient(at 0% 100%, hsla(35, 90%, 50%, 0.05) 0px, transparent 50%);
   background-color: var(--background);
+}
+
+/* ========== Portal/Bridge Animations ========== */
+
+/* Energy flow along the connection line */
+@keyframes energy-flow {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(100vw * 0.4));
+    opacity: 0;
+  }
+}
+
+.animate-energy-flow {
+  animation: energy-flow 2s ease-in-out infinite;
+}
+
+/* Smooth flowing energy beam */
+@keyframes flow-smooth {
+  0% {
+    left: -20%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-flow-smooth {
+  animation: flow-smooth 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Beam flow animation */
+@keyframes beam-flow {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.animate-beam-flow {
+  animation: beam-flow 2s linear infinite;
+}
+
+/* Portal pulsing glow */
+@keyframes portal-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}
+
+.animate-portal-pulse {
+  animation: portal-pulse 1.5s ease-in-out infinite;
+}
+
+/* Portal receiving animation */
+@keyframes portal-receiving {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.animate-portal-receiving {
+  animation: portal-receiving 0.8s ease-in-out infinite;
+}
+
+/* Particle emission from portal */
+@keyframes particle-emit {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(40px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.animate-particle-emit {
+  animation: particle-emit 1s ease-out infinite;
+}
+
+/* Glow pulse effect */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* Slow spin for inner swirl */
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+/* Conic gradient for swirl effect */
+.bg-gradient-conic {
+  background: conic-gradient(
+    from 0deg,
+    var(--primary),
+    transparent,
+    var(--primary)
+  );
+}
+
+/* Animation delays */
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+.animation-delay-600 {
+  animation-delay: 0.6s;
+}
+.animation-delay-700 {
+  animation-delay: 0.7s;
+}
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Particle absorption into portal */
+@keyframes particle-absorb {
+  0% {
+    transform: translateX(-30px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-particle-absorb {
+  animation: particle-absorb 0.8s ease-in infinite;
+}
+
+/* Breathing arrow animation */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(2px);
+    opacity: 1;
+  }
+}
+
+.animate-breathe {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+/* Input focus glow */
+.input-glow:focus {
+  box-shadow: 0 0 0 2px var(--primary), 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+/* Hover glow for interactive elements */
+.hover-glow {
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Success celebration background */
+.celebration-bg {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(34, 197, 94, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+/* Badge gradient animation */
+@keyframes badge-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.badge-shimmer {
+  background: linear-gradient(90deg, var(--primary), #fcd34d, var(--primary));
+  background-size: 200% auto;
+  animation: badge-shimmer 3s linear infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
 }

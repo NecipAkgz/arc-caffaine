@@ -256,7 +256,7 @@ export function SupporterBadgeSection({
           <button
             onClick={handleClaim}
             disabled={!hasDonated || isClaimPending || isConfirming}
-            className="shrink-0 bg-linear-to-r from-purple-500 to-orange-500 hover:from-purple-600 hover:to-orange-600 text-white px-4 py-2 rounded-xl font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-sm"
+            className="relative z-10 shrink-0 bg-linear-to-r from-purple-500 to-orange-500 hover:from-purple-600 hover:to-orange-600 text-white px-4 py-2 rounded-xl font-semibold transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-sm"
           >
             {isClaimPending || isConfirming ? (
               <Loader2 className="w-4 h-4 animate-spin" />
