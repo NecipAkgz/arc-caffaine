@@ -18,6 +18,7 @@ import {
   Bell,
   QrCode,
   Check,
+  Twitter,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import Link from "next/link";
@@ -256,6 +257,19 @@ export default function Dashboard() {
               >
                 <QrCode className="w-4 h-4" />
               </button>
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                  "Support my creative journey on Arc Caffeine! ☕✨\n\nSend USDC & Mint my Supporter NFT on @Arc Testnet 👇\n\n"
+                )}&url=${encodeURIComponent(
+                  username ? `${window.location.origin}/${username}` : ""
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 hover:bg-background rounded transition cursor-pointer text-blue-400 hover:text-blue-500"
+                title="Share on Twitter"
+              >
+                <Twitter className="w-4 h-4" />
+              </a>
               <Link
                 href={`/${username}`}
                 target="_blank"
