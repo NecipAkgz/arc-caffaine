@@ -21,7 +21,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import BridgeModal from "@/components/BridgeModal";
 import { ARC_TESTNET } from "@/lib/bridge-kit/chains";
 import { cn } from "@/lib/utils";
-import { FadeIn, Stagger } from "@/components/animations";
+import { FadeIn, FloatingParticles } from "@/components/animations";
 import { Avatar } from "@/components/ui/Avatar";
 import { SupporterBadgeSection } from "@/components/SupporterBadgeSection";
 
@@ -254,6 +254,7 @@ export default function PublicProfile() {
     <div className="flex-1 bg-background text-foreground selection:bg-primary/20 overflow-x-hidden">
       {/* Background Gradient */}
       <div className="fixed inset-0 bg-gradient-mesh pointer-events-none -z-10" />
+      <FloatingParticles />
 
       <div className="relative max-w-6xl mx-auto p-4 md:p-8 lg:p-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">

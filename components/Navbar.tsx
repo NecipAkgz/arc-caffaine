@@ -6,9 +6,11 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Coffee, ArrowRightLeft } from "lucide-react";
 import { CreatorSearch } from "@/components/CreatorSearch";
 import BridgeModal from "@/components/BridgeModal";
+import { useArcCaffeine } from "@/hooks/useArcCaffeine";
 
 export function Navbar() {
   const [showBridgeModal, setShowBridgeModal] = useState(false);
+  const { isRegistered } = useArcCaffeine();
 
   return (
     <>
@@ -35,12 +37,14 @@ export function Navbar() {
               <ArrowRightLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Bridge</span>
             </button>
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium hover:text-primary transition"
-            >
-              Dashboard
-            </Link>
+            {isRegistered && (
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium hover:text-primary transition"
+              >
+                Dashboard
+              </Link>
+            )}
             <ConnectButton
               showBalance={false}
               accountStatus={{

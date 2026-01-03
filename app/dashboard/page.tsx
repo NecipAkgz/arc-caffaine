@@ -25,7 +25,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import BioModal from "@/components/BioModal";
 import QRCodeModal from "@/components/QRCodeModal";
-import { FadeIn, Stagger } from "@/components/animations";
+import {
+  FadeIn,
+  Stagger,
+  FloatingParticles,
+  CountUp,
+} from "@/components/animations";
 import { Memo } from "@/lib/types";
 import { logger } from "@/lib/logger";
 
@@ -210,7 +215,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="w-full px-4 md:px-8 py-8">
+    <div className="w-full px-4 md:px-8 py-8 relative">
+      <FloatingParticles />
       <div className="mx-auto space-y-8" style={{ maxWidth: "1024px" }}>
         <FadeIn delay={0.2}>
           <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
@@ -289,10 +295,13 @@ export default function Dashboard() {
               <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
                 <DollarSign className="w-5 h-5" /> Current Balance
               </h3>
-              <p className="text-4xl font-bold mt-4">
-                {parseFloat(balance).toFixed(4)}{" "}
-                <span className="text-lg text-muted-foreground">USDC</span>
-              </p>
+              <CountUp
+                end={parseFloat(balance)}
+                decimals={2}
+                duration={2.5}
+                className="text-4xl font-bold mt-4 block"
+                suffix=" USDC"
+              />
             </div>
             <button
               onClick={handleWithdraw}
@@ -312,7 +321,12 @@ export default function Dashboard() {
             <h3 className="text-lg font-medium text-muted-foreground flex items-center gap-2">
               <Coffee className="w-5 h-5" /> Total Coffees
             </h3>
-            <p className="text-4xl font-bold mt-4">{memos.length}</p>
+            <CountUp
+              end={memos.length}
+              decimals={0}
+              duration={2}
+              className="text-4xl font-bold mt-4 block"
+            />
             <p className="text-sm text-muted-foreground mt-2">
               Lifetime supporters
             </p>

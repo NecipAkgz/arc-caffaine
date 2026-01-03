@@ -6,8 +6,14 @@ import { useRegisterForm } from "@/hooks/useRegisterForm";
 import { Coffee, ArrowRight, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { CustomConnectButton } from "@/components/CustomConnectButton";
-import { FadeIn, Stagger } from "@/components/animations";
+import {
+  FadeIn,
+  Stagger,
+  Typewriter,
+  FloatingParticles,
+} from "@/components/animations";
 import { CreatorSearch } from "@/components/CreatorSearch";
+import { LiveActivityFeed } from "@/components/LiveActivityFeed";
 
 /**
  * Landing Page Component
@@ -38,8 +44,21 @@ export default function Home() {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000" />
       </div>
 
+      {/* Floating Particles */}
+      <FloatingParticles />
+
+      {/* Live Activity Feed */}
+      <LiveActivityFeed />
+
       {/* Content */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Value Proposition - Typewriter */}
+        <div className="mb-14 lg:mb-24">
+          <Typewriter
+            phrases={["Create once.", "Share everywhere.", "Earn forever."]}
+          />
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Hero Content */}
           <div className="space-y-8 text-center lg:text-left">
