@@ -13,7 +13,7 @@ const siteConfig = {
   title: "ArcCaffeine",
   description:
     "Support creators with crypto coffee donations on Arc Testnet. Decentralized, transparent, and instant.",
-  url: "https://arccaffaine.vercel.app/",
+  url: "https://arccaffeine.xyz",
   ogImage: "/og-image.png",
 };
 

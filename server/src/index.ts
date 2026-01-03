@@ -81,7 +81,7 @@ bot.onText(/\/start$/, (msg) => {
     chatId,
     "👋 Welcome to ArcCaffeine Bot!\n\n" +
       "To receive donation notifications, please use the 'Connect Telegram' button from your ArcCaffeine dashboard.\n\n" +
-      "Visit: https://arccaffaine.vercel.app/dashboard"
+      "Visit: https://arccaffeine.xyz/dashboard"
   );
 });
 
@@ -133,7 +133,7 @@ async function startEventListener() {
             `💰 Amount: *${amountFormatted} USDC*\n` +
             `👤 From: ${name || "Anonymous"}\n` +
             `💬 Message: _${message || "No message"}_\n\n` +
-            `View on dashboard: https://arc-caffeine.vercel.app/dashboard`;
+            `View on dashboard: https://arccaffeine.xyz/dashboard`;
 
           // Retry mechanism for network issues
           let retries = 3;
