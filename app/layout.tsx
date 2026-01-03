@@ -4,6 +4,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -77,9 +78,7 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <main className="flex-1 flex flex-col">{children}</main>
-            <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground bg-secondary/30">
-              <p>Built with ☕️ on Arc Testnet</p>
-            </footer>
+            <Footer />
           </div>
           <Toaster position="bottom-right" theme="dark" />
         </Providers>

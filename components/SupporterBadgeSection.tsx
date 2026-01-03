@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
   useAccount,
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useSwitchChain,
 } from "wagmi";
 import {
   CREATOR_SUPPORTER_BADGE_ABI,
   CREATOR_SUPPORTER_BADGE_ADDRESS,
 } from "@/lib/badge-abi";
+import { arcTestnet } from "@/lib/chain";
 import { Loader2, Award, Check, ExternalLink } from "lucide-react";
 import { decodeEventLog } from "viem";
 
@@ -31,10 +33,18 @@ export function SupporterBadgeSection({
   creatorUsername,
   hasDonated,
 }: SupporterBadgeSectionProps) {
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState<bigint | null>(null);
   const [nftImageUri, setNftImageUri] = useState<string | null>(null);
+
+  // Ensure user is on Arc Testnet before claiming
+  const ensureNetwork = useCallback(async () => {
+    if (chainId !== arcTestnet.id) {
+      await switchChainAsync({ chainId: arcTestnet.id });
+    }
+  }, [chainId, switchChainAsync]);
 
   // Check if user has claimed for this creator
   const { data: hasClaimed, refetch: refetchHasClaimed } = useReadContract({
@@ -146,12 +156,19 @@ export function SupporterBadgeSection({
   }, [newTokenUri, existingTokenUri]);
 
   const handleClaim = async () => {
-    writeContract({
-      address: CREATOR_SUPPORTER_BADGE_ADDRESS,
-      abi: CREATOR_SUPPORTER_BADGE_ABI,
-      functionName: "claim",
-      args: [creatorUsername],
-    });
+    try {
+      // Switch to Arc Testnet if not already on it
+      await ensureNetwork();
+
+      writeContract({
+        address: CREATOR_SUPPORTER_BADGE_ADDRESS,
+        abi: CREATOR_SUPPORTER_BADGE_ABI,
+        functionName: "claim",
+        args: [creatorUsername],
+      });
+    } catch (error) {
+      console.error("Failed to claim badge:", error);
+    }
   };
 
   const resetClaimState = () => {
