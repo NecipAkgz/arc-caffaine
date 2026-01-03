@@ -7,6 +7,7 @@ import {
   Wallet,
   ChevronDown,
   CheckCircle2,
+  ExternalLink,
 } from "lucide-react";
 import { useAccount, useSwitchChain, useReadContract } from "wagmi";
 import { SUPPORTED_CHAINS, ARC_TESTNET } from "@/lib/bridge-kit/chains";
@@ -238,6 +239,17 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
           automatically.
         </p>
       </div>
+
+      {/* Faucet Link */}
+      <a
+        href="https://faucet.circle.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 text-sm text-zinc-400 hover:text-primary transition-colors py-2"
+      >
+        <span>Need test USDC? Get from Circle Faucet</span>
+        <ExternalLink className="w-4 h-4" />
+      </a>
 
       {/* Action Button */}
       <button
