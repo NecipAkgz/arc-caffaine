@@ -41,14 +41,14 @@ export function useArcCaffeine() {
    * Updates the `username` and `isRegistered` state.
    */
   const checkRegistration = useCallback(async () => {
-    setCheckingRegistration(true);
     if (!address) {
       setIsRegistered(false);
       setUsername(null);
-      setCheckingRegistration(false);
       setCheckedAddress(null);
       return;
     }
+
+    setCheckingRegistration(true);
     try {
       // Check using a client specific to the Arc Testnet.
       const name = await arcPublicClient.readContract({

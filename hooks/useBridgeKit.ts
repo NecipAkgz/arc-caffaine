@@ -95,6 +95,14 @@ export function useBridgeKit() {
         }
 
         // Setup Event Listeners (store refs for cleanup)
+        // Clean up previous handlers before adding new ones to prevent memory leaks
+        const prevHandlers = eventHandlersRef.current;
+        if (prevHandlers.approve) kit.off("approve", prevHandlers.approve);
+        if (prevHandlers.burn) kit.off("burn", prevHandlers.burn);
+        if (prevHandlers.fetchAttestation)
+          kit.off("fetchAttestation", prevHandlers.fetchAttestation);
+        if (prevHandlers.mint) kit.off("mint", prevHandlers.mint);
+
         const approveHandler = (payload: unknown) => {
           logger.debug("Approval completed:", payload);
           setBridgeStep("burning");

@@ -198,10 +198,10 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (!loading && !checkingRegistration && !isRegistered) {
+    if (!loading && !checkingRegistration && !isRegistered && address) {
       router.push("/");
     }
-  }, [loading, checkingRegistration, isRegistered, router]);
+  }, [loading, checkingRegistration, isRegistered, router, address]);
 
   if (loading || checkingRegistration) {
     return (

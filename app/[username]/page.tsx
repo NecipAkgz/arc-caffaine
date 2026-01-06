@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { createPublicClient, http, formatUnits, formatEther } from "viem";
+import { createPublicClient, http, formatUnits, zeroAddress } from "viem";
 import { arcTestnet } from "@/lib/chain";
 import { toast } from "sonner";
 import { useAccount, useReadContract } from "wagmi";
@@ -144,7 +144,7 @@ export default function PublicProfile() {
 
         if (!isMounted) return;
 
-        if (addr && addr !== "0x0000000000000000000000000000000000000000") {
+        if (addr && addr !== zeroAddress) {
           setRecipientAddress(addr);
 
           const bioData = await publicClient.readContract({
@@ -481,7 +481,7 @@ export default function PublicProfile() {
                           </div>
                         </div>
                         <div className="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-xs font-bold border border-green-500/20">
-                          +{formatEther(memo.amount)} USDC
+                          +{formatUnits(memo.amount, 6)} USDC
                         </div>
                       </div>
                       <p className="text-foreground/90 leading-relaxed pl-[52px]">

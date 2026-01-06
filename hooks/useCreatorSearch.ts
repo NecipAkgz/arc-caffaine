@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http, zeroAddress } from "viem";
 import { arcTestnet } from "@/lib/chain";
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from "@/lib/abi";
 import { logger } from "@/lib/logger";
@@ -70,10 +70,7 @@ export function useCreatorSearch() {
           });
 
           // Found a valid address
-          if (
-            address &&
-            address !== "0x0000000000000000000000000000000000000000"
-          ) {
+          if (address && address !== zeroAddress) {
             const searchResult: SearchResult = {
               username: variant, // Use the matched variant
               address: address as string,
@@ -88,7 +85,7 @@ export function useCreatorSearch() {
         setError("User not found");
         const notFoundResult: SearchResult = {
           username: trimmedUsername,
-          address: "0x0000000000000000000000000000000000000000",
+          address: zeroAddress,
           found: false,
         };
         setResult(notFoundResult);

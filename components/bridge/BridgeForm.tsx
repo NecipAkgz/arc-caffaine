@@ -40,7 +40,19 @@ interface BridgeFormProps {
 export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
   const { chain, address } = useAccount();
   const { switchChain } = useSwitchChain();
-  const [selectedChain, setSelectedChain] = useState(chain?.id);
+
+  // Get valid source chains (not destination)
+  const sourceChains = SUPPORTED_CHAINS.filter((c) => !c.isDestination);
+
+  // Initialize with user's chain if it's a valid source, otherwise use first source chain
+  const getInitialChain = () => {
+    if (chain && sourceChains.some((c) => c.id === chain.id)) {
+      return chain.id;
+    }
+    return sourceChains[0]?.id;
+  };
+
+  const [selectedChain, setSelectedChain] = useState(getInitialChain);
   const [bridgeAmount, setBridgeAmount] = useState(defaultAmount);
   const [showChainDropdown, setShowChainDropdown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
