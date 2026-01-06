@@ -6,7 +6,7 @@ import {
 } from "wagmi";
 import { ARC_CAFFEINE_ABI, CONTRACT_ADDRESS } from "@/lib/abi";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { parseEther, createPublicClient, http } from "viem";
+import { parseEther, createPublicClient, http, zeroAddress } from "viem";
 import { arcTestnet } from "@/lib/chain";
 import { logger } from "@/lib/logger";
 
@@ -134,11 +134,39 @@ export function useArcCaffeine() {
       setLoading(true);
       try {
         await ensureNetwork();
+
+        // Try to find user with case-insensitive lookup
+        // For backward compatibility, try lowercase first (new users), then original (old users)
+        const lowercaseUsername = recipientUsername.toLowerCase();
+        let usernameToUse = lowercaseUsername;
+
+        // Check if lowercase version exists
+        const lowercaseAddress = await arcPublicClient.readContract({
+          address: CONTRACT_ADDRESS,
+          abi: ARC_CAFFEINE_ABI,
+          functionName: "addresses",
+          args: [lowercaseUsername],
+        });
+
+        // If lowercase doesn't exist, try original (for backward compatibility)
+        if (!lowercaseAddress || lowercaseAddress === zeroAddress) {
+          const originalAddress = await arcPublicClient.readContract({
+            address: CONTRACT_ADDRESS,
+            abi: ARC_CAFFEINE_ABI,
+            functionName: "addresses",
+            args: [recipientUsername],
+          });
+
+          if (originalAddress && originalAddress !== zeroAddress) {
+            usernameToUse = recipientUsername;
+          }
+        }
+
         const hash = await walletClient.writeContract({
           address: CONTRACT_ADDRESS,
           abi: ARC_CAFFEINE_ABI,
           functionName: "buyCoffee",
-          args: [recipientUsername, name, message],
+          args: [usernameToUse, name, message],
           value: parseEther(amount),
           account: address,
           chain: arcTestnet,
@@ -151,7 +179,7 @@ export function useArcCaffeine() {
         setLoading(false);
       }
     },
-    [walletClient, address, ensureNetwork, publicClient]
+    [walletClient, address, ensureNetwork, publicClient, arcPublicClient]
   );
 
   /**

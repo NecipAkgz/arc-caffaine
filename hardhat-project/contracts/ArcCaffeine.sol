@@ -38,6 +38,11 @@ contract ArcCaffeine {
      * @dev Register a unique username for the caller.
      * @param _username The desired username.
      * @param _bio The optional bio.
+     *
+     * TODO: [PRODUCTION] Add case-insensitive username validation.
+     * Implement toLowerCase() helper function and normalize username before storing.
+     * This will prevent "Neco", "neco", "NECO" from being registered as separate users.
+     * Current workaround: Frontend normalizes to lowercase before calling this function.
      */
     function registerUser(string memory _username, string memory _bio) public {
         require(bytes(_username).length > 0, "Username cannot be empty");

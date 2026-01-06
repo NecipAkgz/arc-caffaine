@@ -31,6 +31,7 @@ export default function Home() {
     bio,
     setBio,
     loading,
+    error,
     handleSubmit,
   } = useRegisterForm();
 
@@ -120,7 +121,7 @@ export default function Home() {
               <div className="flex justify-center lg:justify-start">
                 <CreatorSearch
                   variant="hero"
-                  placeholder="Search for a creator... (e.g. neco)"
+                  placeholder="Search for a creator... (e.g. Neco)"
                 />
               </div>
             </FadeIn>
@@ -208,12 +209,28 @@ export default function Home() {
                         <input
                           id="username"
                           type="text"
-                          placeholder="yourcreatorname"
+                          placeholder="Your username"
                           value={newUsername}
                           onChange={(e) => setUsername(e.target.value)}
-                          className="w-full bg-background/50 backdrop-blur-sm border border-border/50 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                          className={`w-full bg-background/50 backdrop-blur-sm border rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all ${
+                            error
+                              ? "border-red-500/50 focus:border-red-500"
+                              : "border-border/50"
+                          }`}
                           required
                         />
+                        {error ? (
+                          <div className="flex items-start gap-2 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                            <span className="text-red-500 text-lg leading-none">
+                              ⚠
+                            </span>
+                            <span>{error}</span>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">
+                            Username will be converted to lowercase
+                          </p>
+                        )}
                       </div>
 
                       <div className="space-y-2">

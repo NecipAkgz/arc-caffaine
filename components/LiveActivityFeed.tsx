@@ -12,9 +12,9 @@ interface Activity {
 }
 
 const MOCK_ACTIVITIES: Omit<Activity, "id">[] = [
-  { username: "neco", amount: 5 },
-  { username: "croky", amount: 1 },
-  { username: "jane", amount: 3 },
+  { username: "Neco", amount: 5 },
+  { username: "Croky", amount: 1 },
+  { username: "Jane", amount: 3 },
   { username: "emma", amount: 8 },
   { username: "john", amount: 3 },
 ];
