@@ -44,6 +44,9 @@ export function useBridgeKit() {
   const [error, setError] = useState<Error | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [sourceChainId, setSourceChainId] = useState<number | null>(null);
+  const [destinationChainId, setDestinationChainId] = useState<number | null>(
+    null
+  );
 
   const kit = useMemo(() => getBridgeKitInstance(), []);
 
@@ -68,13 +71,14 @@ export function useBridgeKit() {
   }, [kit]);
 
   /**
-   * Initiates the bridging process to the Arc Network.
+   * Initiates the bridging process between any two supported chains.
    *
    * @param amount - The amount of USDC to bridge.
-   * @param sourceChainId - The ID of the source chain.
+   * @param fromChainId - The ID of the source chain.
+   * @param toChainId - The ID of the destination chain.
    */
-  const bridgeToArc = useCallback(
-    async (amount: string, sourceChainId: number) => {
+  const bridge = useCallback(
+    async (amount: string, fromChainId: number, toChainId: number) => {
       if (!connector || !address || !publicClient) {
         throw new Error("Wallet not connected");
       }
@@ -84,13 +88,15 @@ export function useBridgeKit() {
         setBridgeStep("preparing");
         setError(null);
         setTxHash(null);
-        setSourceChainId(sourceChainId);
+        setSourceChainId(fromChainId);
+        setDestinationChainId(toChainId);
 
-        // Get chain data
-        const sourceChainData = SUPPORTED_CHAINS.find(
-          (c) => c.id === sourceChainId
+        // Get chain data for both chains
+        const fromChainData = SUPPORTED_CHAINS.find(
+          (c) => c.id === fromChainId
         );
-        if (!sourceChainData?.usdcAddress) {
+        const toChainData = SUPPORTED_CHAINS.find((c) => c.id === toChainId);
+        if (!fromChainData?.usdcAddress || !toChainData?.usdcAddress) {
           throw new Error("Chain configuration missing");
         }
 
@@ -193,24 +199,25 @@ export function useBridgeKit() {
           },
         });
 
-        const sourceChain = getBridgeKitChainName(sourceChainId);
+        const fromChainName = getBridgeKitChainName(fromChainId);
+        const toChainName = getBridgeKitChainName(toChainId);
 
-        if (!sourceChain) {
+        if (!fromChainName || !toChainName) {
           throw new Error("Unsupported chain");
         }
 
         // 4. Bridge
         setBridgeStep("approving");
 
-        // Bridge USDC to Arc Network
+        // Bridge USDC between chains
         const result = await kit.bridge({
           from: {
             adapter,
-            chain: sourceChain as any,
+            chain: fromChainName as any,
           },
           to: {
             adapter,
-            chain: ARC_TESTNET.bridgeKitName as any,
+            chain: toChainName as any,
           },
           amount: amount,
           config: {
@@ -262,16 +269,36 @@ export function useBridgeKit() {
     setError(null);
     setTxHash(null);
     setSourceChainId(null);
+    setDestinationChainId(null);
   }, []);
 
+  // Convenience wrapper for bridging TO Arc (backward compatible)
+  const bridgeToArc = useCallback(
+    async (amount: string, fromChainId: number) => {
+      return bridge(amount, fromChainId, ARC_TESTNET.id);
+    },
+    [bridge]
+  );
+
+  // Convenience wrapper for bridging FROM Arc
+  const bridgeFromArc = useCallback(
+    async (amount: string, toChainId: number) => {
+      return bridge(amount, ARC_TESTNET.id, toChainId);
+    },
+    [bridge]
+  );
+
   return {
+    bridge,
     bridgeToArc,
+    bridgeFromArc,
     reset,
     status,
     bridgeStep,
     error,
     txHash,
     sourceChainId,
+    destinationChainId,
     isIdle: status === "idle",
     isBridging: status === "bridging",
     isComplete: status === "complete",

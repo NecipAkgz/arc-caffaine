@@ -2,10 +2,12 @@
 
 import { BridgeStepItem } from "./BridgeStepItem";
 import { PortalAnimation } from "./PortalAnimation";
+import { getChainByWagmiId, ARC_TESTNET } from "@/lib/bridge-kit/chains";
 
 interface BridgeProgressProps {
   currentStep: string;
   sourceChainId?: number;
+  destinationChainId?: number;
 }
 
 type BridgeStep =
@@ -25,7 +27,13 @@ type BridgeStep =
 export function BridgeProgress({
   currentStep,
   sourceChainId,
+  destinationChainId,
 }: BridgeProgressProps) {
+  const destChain = destinationChainId
+    ? getChainByWagmiId(destinationChainId)
+    : ARC_TESTNET;
+  const destChainName = destChain?.name || "destination chain";
+
   return (
     <div className="py-2 space-y-6">
       {/* Header */}
@@ -36,7 +44,9 @@ export function BridgeProgress({
             Transaction in Progress
           </span>
         </div>
-        <h3 className="text-xl font-bold text-white">Bridging to Arc</h3>
+        <h3 className="text-xl font-bold text-white">
+          Bridging to {destChainName}
+        </h3>
         <p className="text-sm text-zinc-500 mt-1">
           Please keep this window open
         </p>
@@ -46,6 +56,7 @@ export function BridgeProgress({
       <PortalAnimation
         currentStep={currentStep as BridgeStep}
         sourceChainId={sourceChainId}
+        destinationChainId={destinationChainId}
         className="my-6"
       />
 
@@ -79,7 +90,7 @@ export function BridgeProgress({
           step="minting"
           currentStep={currentStep}
           label="Minting"
-          description="Finalizing on Arc Network"
+          description={`Finalizing on ${destChainName}`}
           isLast
         />
       </div>

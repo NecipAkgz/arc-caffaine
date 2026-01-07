@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { ChainIcon } from "@/components/ChainIcon";
-import { getChainByWagmiId } from "@/lib/bridge-kit/chains";
+import { getChainByWagmiId, ARC_TESTNET } from "@/lib/bridge-kit/chains";
 
 type BridgeStep =
   | "preparing"
@@ -15,6 +15,7 @@ type BridgeStep =
 interface PortalAnimationProps {
   currentStep: BridgeStep;
   sourceChainId?: number;
+  destinationChainId?: number;
   className?: string;
 }
 
@@ -37,6 +38,7 @@ type PortalState = "idle" | "active" | "complete";
 export function PortalAnimation({
   currentStep,
   sourceChainId,
+  destinationChainId,
   className,
 }: PortalAnimationProps) {
   const stepIndex = STEP_ORDER.indexOf(currentStep);
@@ -47,6 +49,13 @@ export function PortalAnimation({
   const sourceChain = sourceChainId ? getChainByWagmiId(sourceChainId) : null;
   const sourceIconName = sourceChain?.iconName || "ethereum";
   const sourceName = sourceChain?.name?.split(" ")[0] || "Source";
+
+  // Get destination chain info
+  const destChain = destinationChainId
+    ? getChainByWagmiId(destinationChainId)
+    : ARC_TESTNET;
+  const destIconName = destChain?.iconName || "arc";
+  const destName = destChain?.name?.split(" ")[0] || "Arc";
 
   // Determine states
   const sourceState: PortalState = isComplete
@@ -80,7 +89,12 @@ export function PortalAnimation({
           state={sourceState}
           align="left"
         />
-        <PortalNode iconName="arc" name="Arc" state={destState} align="right" />
+        <PortalNode
+          iconName={destIconName}
+          name={destName}
+          state={destState}
+          align="right"
+        />
       </div>
     </div>
   );

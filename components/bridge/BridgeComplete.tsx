@@ -1,11 +1,12 @@
 "use client";
 
 import { CheckCircle2, ExternalLink, Sparkles } from "lucide-react";
-import { ARC_TESTNET } from "@/lib/bridge-kit/chains";
+import { ARC_TESTNET, getChainByWagmiId } from "@/lib/bridge-kit/chains";
 
 interface BridgeCompleteProps {
   txHash?: string;
   sourceChainId?: number;
+  destinationChainId?: number;
   onClose: () => void;
 }
 
@@ -14,8 +15,16 @@ interface BridgeCompleteProps {
  *
  * Displays success message with elegant animation and transaction details.
  */
-export function BridgeComplete({ txHash, onClose }: BridgeCompleteProps) {
-  const explorerUrl = ARC_TESTNET.explorerUrl;
+export function BridgeComplete({
+  txHash,
+  destinationChainId,
+  onClose,
+}: BridgeCompleteProps) {
+  const destChain = destinationChainId
+    ? getChainByWagmiId(destinationChainId)
+    : ARC_TESTNET;
+  const explorerUrl = destChain?.explorerUrl || ARC_TESTNET.explorerUrl;
+  const destChainName = destChain?.name || "destination chain";
 
   return (
     <div className="text-center py-6 relative">
@@ -40,7 +49,7 @@ export function BridgeComplete({ txHash, onClose }: BridgeCompleteProps) {
         {/* Success text */}
         <h3 className="text-2xl font-bold text-white mb-2">Bridge Complete!</h3>
         <p className="text-zinc-400 mb-8">
-          Your funds have been successfully bridged to Arc Testnet.
+          Your funds have been successfully bridged to {destChainName}.
         </p>
 
         {/* Action buttons */}

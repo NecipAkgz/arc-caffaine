@@ -53,11 +53,15 @@ export const SUPPORTED_CHAINS: Chain[] = [
     nativeCurrency: "ETH",
     usdcAddress: "0x3600000000000000000000000000000000000000",
     explorerUrl: "https://testnet.arcscan.app",
-    isDestination: true,
+    rpcUrl: "https://rpc.testnet.arc.network",
   },
 ];
 
-export const ARC_TESTNET = SUPPORTED_CHAINS.find((c) => c.isDestination)!;
+// Arc Testnet chain ID
+export const ARC_TESTNET_ID = 5042002;
+export const ARC_TESTNET = SUPPORTED_CHAINS.find(
+  (c) => c.id === ARC_TESTNET_ID
+)!;
 
 export function getChainByWagmiId(chainId: number) {
   return SUPPORTED_CHAINS.find((c) => c.id === chainId);
@@ -67,14 +71,18 @@ export function getBridgeKitChainName(chainId: number) {
   return getChainByWagmiId(chainId)?.bridgeKitName;
 }
 
-export function isBridgeSupported(chainId: number) {
-  const chain = getChainByWagmiId(chainId);
-  return chain && !chain.isDestination;
+export function isArcTestnet(chainId: number) {
+  return chainId === ARC_TESTNET_ID;
 }
 
 export function getBestRpcUrl(chainId: number) {
   const chain = getChainByWagmiId(chainId);
-  if (!chain || chain.id === ARC_TESTNET.id) return undefined;
+  if (!chain) return undefined;
+
+  // For Arc Testnet, always use its RPC
+  if (chain.id === ARC_TESTNET_ID) {
+    return chain.rpcUrl;
+  }
 
   const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
   if (alchemyKey && chain.alchemyHost) {

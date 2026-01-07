@@ -30,12 +30,13 @@ export default function BridgeModal({
   amount,
 }: BridgeModalProps) {
   const {
-    bridgeToArc,
+    bridge,
     status,
     bridgeStep,
     error,
     txHash,
     sourceChainId,
+    destinationChainId,
     reset,
   } = useBridgeKit();
 
@@ -61,9 +62,13 @@ export default function BridgeModal({
     onClose();
   };
 
-  const handleBridge = async (bridgeAmount: string, selectedChain: number) => {
+  const handleBridge = async (
+    bridgeAmount: string,
+    fromChainId: number,
+    toChainId: number
+  ) => {
     try {
-      await bridgeToArc(bridgeAmount, selectedChain);
+      await bridge(bridgeAmount, fromChainId, toChainId);
     } catch (err) {
       console.error("Bridge failed:", err);
     }
@@ -105,18 +110,26 @@ export default function BridgeModal({
             <BridgeProgress
               currentStep={bridgeStep}
               sourceChainId={sourceChainId ?? undefined}
+              destinationChainId={destinationChainId ?? undefined}
             />
           )}
 
           {status === "complete" && (
             <BridgeComplete
               txHash={txHash ?? undefined}
-              sourceChainId={sourceChainId ?? undefined}
+              destinationChainId={destinationChainId ?? undefined}
               onClose={handleClose}
             />
           )}
 
-          {status === "error" && <BridgeError error={error} onRetry={reset} />}
+          {status === "error" && (
+            <BridgeError
+              error={error}
+              txHash={txHash}
+              destinationChainId={destinationChainId}
+              onRetry={reset}
+            />
+          )}
         </div>
       </div>
     </div>
