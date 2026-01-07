@@ -13,7 +13,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { createPublicClient, http, formatUnits, zeroAddress } from "viem";
+import {
+  createPublicClient,
+  http,
+  formatEther,
+  zeroAddress,
+  formatUnits,
+} from "viem";
 import { arcTestnet } from "@/lib/chain";
 import { toast } from "sonner";
 import { useAccount, useReadContract } from "wagmi";
@@ -481,7 +487,7 @@ export default function PublicProfile() {
                           </div>
                         </div>
                         <div className="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-xs font-bold border border-green-500/20">
-                          +{formatUnits(memo.amount, 6)} USDC
+                          +{formatEther(memo.amount)} USDC
                         </div>
                       </div>
                       <p className="text-foreground/90 leading-relaxed pl-[52px]">
