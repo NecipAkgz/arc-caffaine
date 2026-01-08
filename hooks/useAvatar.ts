@@ -1,12 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { createPublicClient, http } from "viem";
-import { normalize } from "viem/ens";
-import { mainnet } from "viem/chains";
 
 /**
  * Avatar source types for the fallback chain.
+ * Note: "ens" kept for type compatibility but ENS resolution disabled due to CORS issues.
  */
 export type AvatarSource = "ens" | "farcaster" | "effigy" | "gradient";
 
@@ -19,12 +17,6 @@ interface UseAvatarResult {
   isLoading: boolean;
   isError: boolean;
 }
-
-// Mainnet client for ENS resolution (ENS only exists on mainnet)
-const mainnetClient = createPublicClient({
-  chain: mainnet,
-  transport: http(),
-});
 
 // LocalStorage cache key prefix
 const AVATAR_CACHE_KEY = "arc_avatar_cache_";
@@ -59,7 +51,7 @@ function getEffigyUrl(address: string): string {
 
 /**
  * Fetches Farcaster avatar by verified Ethereum address.
- * Uses Neynar's public API endpoint.
+ * Uses Neynar's public API endpoint with rate limit handling.
  *
  * @param address - The wallet address.
  * @returns Farcaster profile picture URL or null.
@@ -77,6 +69,11 @@ async function getFarcasterAvatar(address: string): Promise<string | null> {
         },
       }
     );
+
+    // Handle rate limiting - return null instead of throwing
+    if (response.status === 429) {
+      return null;
+    }
 
     if (!response.ok) return null;
 
@@ -147,7 +144,8 @@ function setCachedAvatar(
 }
 
 /**
- * Resolves avatar URL with fallback chain: ENS → Farcaster → Effigy → Gradient.
+ * Resolves avatar URL with fallback chain: Farcaster → Effigy → Gradient.
+ * ENS resolution removed to avoid CORS issues with public RPC endpoints.
  *
  * @param address - The wallet address.
  * @returns Avatar URL and source.
@@ -159,27 +157,7 @@ async function resolveAvatar(
   const cached = getCachedAvatar(address);
   if (cached) return cached;
 
-  // Try ENS avatar (mainnet)
-  try {
-    const ensName = await mainnetClient.getEnsName({
-      address: address as `0x${string}`,
-    });
-
-    if (ensName) {
-      const ensAvatar = await mainnetClient.getEnsAvatar({
-        name: normalize(ensName),
-      });
-
-      if (ensAvatar) {
-        setCachedAvatar(address, ensAvatar, "ens");
-        return { url: ensAvatar, source: "ens" };
-      }
-    }
-  } catch {
-    // ENS resolution failed, continue to fallback
-  }
-
-  // Try Farcaster avatar
+  // Try Farcaster avatar (skip if we've been rate limited recently)
   const farcasterAvatar = await getFarcasterAvatar(address);
   if (farcasterAvatar) {
     setCachedAvatar(address, farcasterAvatar, "farcaster");

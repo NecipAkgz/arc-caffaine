@@ -8,7 +8,12 @@ import { Footer } from "@/components/Footer";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+  preload: false,
+});
 
 const siteConfig = {
   title: "ArcCaffeine",

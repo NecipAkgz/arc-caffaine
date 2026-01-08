@@ -103,7 +103,10 @@ export function useArcCaffeine() {
           account: address,
           chain: arcTestnet,
         });
-        await publicClient?.waitForTransactionReceipt({ hash });
+        await publicClient?.waitForTransactionReceipt({
+          hash,
+          timeout: 30_000,
+        });
         await checkRegistration();
       } catch (error) {
         logger.error("Registration failed", error);
@@ -171,7 +174,11 @@ export function useArcCaffeine() {
           account: address,
           chain: arcTestnet,
         });
-        await publicClient?.waitForTransactionReceipt({ hash });
+        // Wait for transaction receipt with timeout to prevent infinite loading state
+        await publicClient?.waitForTransactionReceipt({
+          hash,
+          timeout: 30_000, // 30 second timeout
+        });
       } catch (error) {
         logger.error("Buy Coffee failed", error);
         throw error;
@@ -197,7 +204,10 @@ export function useArcCaffeine() {
         account: address,
         chain: arcTestnet,
       });
-      await publicClient?.waitForTransactionReceipt({ hash });
+      await publicClient?.waitForTransactionReceipt({
+        hash,
+        timeout: 30_000,
+      });
     } catch (error) {
       logger.error("Withdraw failed", error);
       throw error;
@@ -225,7 +235,10 @@ export function useArcCaffeine() {
           account: address,
           chain: arcTestnet,
         });
-        await publicClient?.waitForTransactionReceipt({ hash });
+        await publicClient?.waitForTransactionReceipt({
+          hash,
+          timeout: 30_000,
+        });
       } catch (error) {
         logger.error("Update Bio failed", error);
         throw error;

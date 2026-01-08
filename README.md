@@ -63,6 +63,8 @@ The backbone of ArcCaffeine, handling decentralized registration and payments.
 
 > **Contract Address:** [`0xcC7F8BD425265EA2619B0876B76487B824D57c2d`](https://testnet.arcscan.app/address/0xcC7F8BD425265EA2619B0876B76487B824D57c2d)
 
+> **Supporter NFT Contract Address:** [`0x76A7983c9852EeCd88Ef456096D7408e61a3bE18`](https://testnet.arcscan.app/address/0x76A7983c9852EeCd88Ef456096D7408e61a3bE18)
+
 ---
 
 ## ▸ Workflow & Notifications

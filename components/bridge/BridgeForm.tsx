@@ -10,6 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useAccount, useSwitchChain, useReadContract } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   SUPPORTED_CHAINS,
   ARC_TESTNET,
@@ -48,7 +49,7 @@ interface BridgeFormProps {
  * Supports bi-directional bridging with a switch button.
  */
 export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
-  const { chain, address } = useAccount();
+  const { chain, address, isConnected } = useAccount();
   const { switchChain } = useSwitchChain();
 
   // Direction state - toArc: Other → Arc, fromArc: Arc → Other
@@ -319,32 +320,55 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
       </a>
 
       {/* Action Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={
-          !fromChain ||
-          !toChain ||
-          !bridgeAmount ||
-          parseFloat(bridgeAmount) <= 0
-        }
-        className={cn(
-          "w-full py-4 rounded-xl font-bold transition-all duration-300",
-          "bg-linear-to-r from-primary to-amber-500 text-primary-foreground",
-          "hover:from-primary/90 hover:to-amber-500/90",
-          "cursor-pointer",
-          "shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02]",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100",
-          "disabled:from-zinc-700 disabled:to-zinc-600"
-        )}
-      >
-        {!fromChain
-          ? "Select Source Chain"
-          : !bridgeAmount || parseFloat(bridgeAmount) <= 0
-          ? "Enter Amount"
-          : direction === "toArc"
-          ? "Bridge to Arc"
-          : "Bridge from Arc"}
-      </button>
+      {!isConnected ? (
+        <ConnectButton.Custom>
+          {({ openConnectModal, mounted }) => (
+            <button
+              type="button"
+              onClick={openConnectModal}
+              disabled={!mounted}
+              className={cn(
+                "w-full py-4 rounded-xl font-bold transition-all duration-300",
+                "bg-linear-to-r from-primary to-amber-500 text-primary-foreground",
+                "hover:from-primary/90 hover:to-amber-500/90",
+                "cursor-pointer",
+                "shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02]",
+                "flex items-center justify-center gap-2"
+              )}
+            >
+              <Wallet className="w-5 h-5" />
+              Connect Wallet
+            </button>
+          )}
+        </ConnectButton.Custom>
+      ) : (
+        <button
+          onClick={handleSubmit}
+          disabled={
+            !fromChain ||
+            !toChain ||
+            !bridgeAmount ||
+            parseFloat(bridgeAmount) <= 0
+          }
+          className={cn(
+            "w-full py-4 rounded-xl font-bold transition-all duration-300",
+            "bg-linear-to-r from-primary to-amber-500 text-primary-foreground",
+            "hover:from-primary/90 hover:to-amber-500/90",
+            "cursor-pointer",
+            "shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02]",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100",
+            "disabled:from-zinc-700 disabled:to-zinc-600"
+          )}
+        >
+          {!fromChain
+            ? "Select Source Chain"
+            : !bridgeAmount || parseFloat(bridgeAmount) <= 0
+            ? "Enter Amount"
+            : direction === "toArc"
+            ? "Bridge to Arc"
+            : "Bridge from Arc"}
+        </button>
+      )}
     </div>
   );
 }
