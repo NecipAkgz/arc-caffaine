@@ -121,10 +121,22 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
   const handleChainSelect = async (chainId: number) => {
     setSelectedOtherChain(chainId);
     setShowChainDropdown(false);
-    // Switch wallet to the from chain if needed
+
+    // Only switch if direction is "toArc" - we need to be on the source chain
+    // If direction is "fromArc", we need to stay on Arc Testnet
     const targetFromChain = direction === "toArc" ? chainId : ARC_TESTNET_ID;
-    if (chain?.id !== targetFromChain) {
-      await switchChain({ chainId: targetFromChain });
+
+    // Check if wallet is already on the target chain
+    // Use the current chain ID directly to avoid stale state issues
+    const currentChainId = chain?.id;
+
+    if (currentChainId !== undefined && currentChainId !== targetFromChain) {
+      try {
+        await switchChain({ chainId: targetFromChain });
+      } catch (error) {
+        // User rejected the switch or chain not added - ignore silently
+        console.warn("Chain switch cancelled or failed:", error);
+      }
     }
   };
 
@@ -136,10 +148,18 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
   const handleSubmit = async () => {
     if (!fromChainId || !toChainId) return;
 
-    // Switch chain to source if needed
-    if (chain?.id !== fromChainId) {
-      await switchChain({ chainId: fromChainId });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Check if we need to switch to the source chain
+    const currentChainId = chain?.id;
+
+    if (currentChainId !== undefined && currentChainId !== fromChainId) {
+      try {
+        await switchChain({ chainId: fromChainId });
+        // Wait for chain switch to complete
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.warn("Chain switch cancelled or failed:", error);
+        return; // Don't proceed if chain switch failed
+      }
     }
 
     await onBridge(bridgeAmount, fromChainId, toChainId);

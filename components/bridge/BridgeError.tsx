@@ -1,7 +1,19 @@
 "use client";
 
-import { AlertCircle, RefreshCw, ExternalLink, Clock } from "lucide-react";
+import {
+  AlertCircle,
+  RefreshCw,
+  ExternalLink,
+  Clock,
+  Wallet,
+  Wifi,
+  Link2,
+} from "lucide-react";
 import { getChainByWagmiId, ARC_TESTNET } from "@/lib/bridge-kit/chains";
+import {
+  getSmartErrorInfo,
+  type SmartErrorInfo,
+} from "@/lib/bridge-kit/bridge-errors";
 
 interface BridgeErrorProps {
   error?: Error | null;
@@ -13,8 +25,8 @@ interface BridgeErrorProps {
 /**
  * Bridge Error Component
  *
- * Displays error message and retry option when bridge fails.
- * Shows special handling for timeout errors when tx hash exists.
+ * Displays smart, context-aware error messages using Bridge Kit
+ * error type guards for better user experience.
  */
 export function BridgeError({
   error,
@@ -22,6 +34,7 @@ export function BridgeError({
   destinationChainId,
   onRetry,
 }: BridgeErrorProps) {
+  const errorInfo = getSmartErrorInfo(error);
   const isTimeout = error?.message?.toLowerCase().includes("timed out");
   const hasTxHash = !!txHash;
 
@@ -31,22 +44,60 @@ export function BridgeError({
     : ARC_TESTNET;
   const explorerUrl = destChain?.explorerUrl || ARC_TESTNET.explorerUrl;
 
-  const formatError = (message: string) => {
-    if (!message) return "Unknown error occurred";
-    let cleanMessage = message.split("Request Arguments:")[0];
-    cleanMessage = cleanMessage.split("Details:")[0];
-    return cleanMessage.replace(/^Error:\s*/, "").trim();
+  // Render icon based on error type
+  const renderIcon = (info: SmartErrorInfo) => {
+    const iconClass = "w-10 h-10";
+
+    switch (info.icon) {
+      case "balance":
+        return <Wallet className={`${iconClass} text-amber-500`} />;
+      case "network":
+        return <Wifi className={`${iconClass} text-orange-500`} />;
+      case "chain":
+        return <Link2 className={`${iconClass} text-blue-500`} />;
+      case "warning":
+        return <Clock className={`${iconClass} text-amber-500`} />;
+      default:
+        return <AlertCircle className={`${iconClass} text-red-500`} />;
+    }
   };
+
+  // Get color theme based on severity
+  const getColorTheme = (severity: SmartErrorInfo["severity"]) => {
+    switch (severity) {
+      case "warning":
+        return {
+          bg: "from-amber-500/5",
+          iconBg: "from-amber-400/20 to-amber-600/20",
+          iconBorder: "border-amber-500/30",
+          glow: "bg-amber-500/10",
+        };
+      case "fatal":
+        return {
+          bg: "from-violet-500/5",
+          iconBg: "from-violet-400/20 to-violet-600/20",
+          iconBorder: "border-violet-500/30",
+          glow: "bg-violet-500/10",
+        };
+      default:
+        return {
+          bg: "from-red-500/5",
+          iconBg: "from-red-400/20 to-red-600/20",
+          iconBorder: "border-red-500/30",
+          glow: "bg-red-500/10",
+        };
+    }
+  };
+
+  const theme = getColorTheme(errorInfo.severity);
 
   // Special handling: Timeout with tx hash - likely successful
   if (isTimeout && hasTxHash) {
     return (
       <div className="text-center py-6 relative">
-        {/* Warning background glow */}
         <div className="absolute inset-0 bg-linear-to-b from-amber-500/5 to-transparent rounded-2xl" />
 
         <div className="relative z-10">
-          {/* Warning Icon */}
           <div className="relative inline-block mb-6">
             <div className="absolute -inset-3 bg-amber-500/10 rounded-full blur-lg" />
             <div className="relative w-20 h-20 bg-linear-to-br from-amber-400/20 to-amber-600/20 border border-amber-500/30 rounded-full flex items-center justify-center">
@@ -84,33 +135,53 @@ export function BridgeError({
     );
   }
 
-  // Regular error handling
+  // Smart error handling with context-aware UI
   return (
     <div className="text-center py-6 relative">
-      {/* Error background glow */}
-      <div className="absolute inset-0 bg-linear-to-b from-red-500/5 to-transparent rounded-2xl" />
+      {/* Background glow */}
+      <div
+        className={`absolute inset-0 bg-linear-to-b ${theme.bg} to-transparent rounded-2xl`}
+      />
 
       <div className="relative z-10">
-        {/* Error Icon */}
+        {/* Icon */}
         <div className="relative inline-block mb-6">
-          <div className="absolute -inset-3 bg-red-500/10 rounded-full blur-lg" />
-          <div className="relative w-20 h-20 bg-linear-to-br from-red-400/20 to-red-600/20 border border-red-500/30 rounded-full flex items-center justify-center">
-            <AlertCircle className="w-10 h-10 text-red-500" />
+          <div
+            className={`absolute -inset-3 ${theme.glow} rounded-full blur-lg`}
+          />
+          <div
+            className={`relative w-20 h-20 bg-linear-to-br ${theme.iconBg} border ${theme.iconBorder} rounded-full flex items-center justify-center`}
+          >
+            {renderIcon(errorInfo)}
           </div>
         </div>
 
-        <h3 className="text-xl font-bold text-white mb-2">Bridge Failed</h3>
+        {/* Title & Message */}
+        <h3 className="text-xl font-bold text-white mb-2">{errorInfo.title}</h3>
         <p className="text-zinc-400 mb-8 text-sm px-4 leading-relaxed">
-          {formatError(error?.message || "An unexpected error occurred")}
+          {errorInfo.message}
         </p>
 
-        <button
-          onClick={onRetry}
-          className="w-full flex items-center justify-center gap-2 bg-zinc-800/80 hover:bg-zinc-700 text-white py-3.5 rounded-xl transition-all font-medium hover-glow border border-white/5"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Try Again
-        </button>
+        {/* Actions */}
+        <div className="space-y-3">
+          {errorInfo.isRetryable && (
+            <button
+              onClick={onRetry}
+              className="w-full flex items-center justify-center gap-2 bg-zinc-800/80 hover:bg-zinc-700 text-white py-3.5 rounded-xl transition-all font-medium hover-glow border border-white/5"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Try Again
+            </button>
+          )}
+          {!errorInfo.isRetryable && (
+            <button
+              onClick={onRetry}
+              className="w-full flex items-center justify-center gap-2 bg-zinc-800/80 hover:bg-zinc-700 text-white py-3.5 rounded-xl transition-all font-medium hover-glow border border-white/5"
+            >
+              Close
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
