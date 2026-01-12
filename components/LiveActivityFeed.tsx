@@ -63,7 +63,7 @@ export function LiveActivityFeed() {
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"
+      className="hidden md:flex fixed bottom-6 right-6 z-40 flex-col gap-3 pointer-events-none"
       aria-live="polite"
       aria-atomic="true"
     >
@@ -114,10 +114,10 @@ function ActivityToast({ activity }: { activity: Activity }) {
   return (
     <div
       ref={toastRef}
-      className="glass-card px-4 py-3 flex items-center gap-3 min-w-[280px] pointer-events-auto"
+      className="glass-card px-4 py-3 flex items-center gap-3 min-w-[260px] pointer-events-auto shadow-lg"
     >
-      <div className="shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-        <Coffee className="w-5 h-5 text-primary" />
+      <div className="shrink-0 w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
+        <Coffee className="w-4 h-4 text-primary" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">

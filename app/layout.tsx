@@ -86,7 +86,25 @@ export default function RootLayout({
             <main className="flex-1 flex flex-col">{children}</main>
             <Footer />
           </div>
-          <Toaster position="bottom-right" theme="dark" />
+          <Toaster
+            position="bottom-right"
+            theme="dark"
+            richColors
+            closeButton
+            toastOptions={{
+              classNames: {
+                toast:
+                  "bg-zinc-900/90 backdrop-blur-md border-zinc-800 shadow-xl",
+                title: "text-zinc-100 font-semibold",
+                description: "text-zinc-400",
+                success: "border-green-500/30 bg-green-950/50",
+                error: "border-red-500/30 bg-red-950/50",
+                warning: "border-amber-500/30 bg-amber-950/50",
+                info: "border-blue-500/30 bg-blue-950/50",
+              },
+              duration: 4000,
+            }}
+          />
         </Providers>
         <Analytics />
       </body>

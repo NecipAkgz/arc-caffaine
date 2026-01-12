@@ -22,6 +22,8 @@
   --ring: #f59e0b;
 
   --radius: 0.5rem;
+
+  --footer-height: 120px;
 }
 
 @theme inline {
@@ -94,6 +96,11 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Sonner Toast - Position above footer */
+[data-sonner-toaster][data-y-position="bottom"] {
+  bottom: var(--footer-height, 80px) !important;
 }
 
 /* Custom Scrollbar - Modern & Slim */
