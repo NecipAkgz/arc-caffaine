@@ -225,63 +225,65 @@ export default function Dashboard() {
               <h1 className="text-3xl font-bold">Dashboard</h1>
               <p className="text-muted-foreground">Welcome back, @{username}</p>
             </div>
-            <div className="flex items-center gap-2 bg-secondary/50 p-2 rounded-lg border border-border">
-              <span className="text-sm text-muted-foreground px-2">
+            <div className="w-full sm:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-2 bg-secondary/50 p-2 rounded-lg border border-border">
+              <span className="text-sm text-muted-foreground px-2 shrink-0">
                 Your Page:
               </span>
-              <code className="text-sm font-mono bg-background px-2 py-1 rounded">
-                {username ? `${window.location.origin}/${username}` : "..."}
-              </code>
-              <button
-                onClick={handleCopy}
-                className={`p-2 rounded transition cursor-pointer flex items-center gap-1 ${
-                  copied
-                    ? "bg-green-500/20 text-green-500"
-                    : "hover:bg-background"
-                }`}
-                title="Copy Link"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span className="text-xs font-medium">Copied!</span>
-                  </>
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-              <button
-                onClick={() => setIsQRModalOpen(true)}
-                className="p-2 hover:bg-background rounded transition cursor-pointer"
-                title="Show QR Code"
-              >
-                <QrCode className="w-4 h-4" />
-              </button>
-              <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  "Support my creative journey on Arc Caffeine! ☕✨\n\nSend USDC & Mint my Supporter NFT on @Arc Testnet 👇\n\n"
-                )}&url=${encodeURIComponent(
-                  username ? `${window.location.origin}/${username}` : ""
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 hover:bg-background rounded transition cursor-pointer text-blue-400 hover:text-blue-500"
-                title="Share on Twitter"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-              <Link
-                href={`/${username}`}
-                target="_blank"
-                className="p-2 hover:bg-background rounded transition"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </Link>
+              <div className="flex items-center gap-1 w-full sm:w-auto overflow-hidden">
+                <code className="text-sm font-mono bg-background px-2 py-1 rounded truncate max-w-[200px] sm:max-w-none">
+                  {username ? `${window.location.origin}/${username}` : "..."}
+                </code>
+                <button
+                  onClick={handleCopy}
+                  className={`p-2 rounded transition cursor-pointer flex items-center gap-1 shrink-0 ${
+                    copied
+                      ? "bg-green-500/20 text-green-500"
+                      : "hover:bg-background"
+                  }`}
+                  title="Copy Link"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span className="text-xs font-medium">Copied!</span>
+                    </>
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setIsQRModalOpen(true)}
+                  className="p-2 hover:bg-background rounded transition cursor-pointer shrink-0"
+                  title="Show QR Code"
+                >
+                  <QrCode className="w-4 h-4" />
+                </button>
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                    "Support my creative journey on Arc Caffeine! ☕✨\n\nSend USDC & Mint my Supporter NFT on @Arc Testnet 👇\n\n"
+                  )}&url=${encodeURIComponent(
+                    username ? `${window.location.origin}/${username}` : ""
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 hover:bg-background rounded transition cursor-pointer text-blue-400 hover:text-blue-500 shrink-0"
+                  title="Share on Twitter"
+                >
+                  <Twitter className="w-4 h-4" />
+                </a>
+                <Link
+                  href={`/${username}`}
+                  target="_blank"
+                  className="p-2 hover:bg-background rounded transition shrink-0"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
             {telegramConnected ? (
               <div className="flex items-center gap-2 bg-green-600/20 border border-green-600/30 text-green-600 px-4 py-2 rounded-lg font-medium">
                 <Bell className="w-4 h-4" />
-                <span className="hidden sm:inline">Connected ✓</span>
+                <span className="">Connected ✓</span>
               </div>
             ) : (
               <a
@@ -292,7 +294,7 @@ export default function Dashboard() {
                 title="Get notified on Telegram when you receive a coffee"
               >
                 <Bell className="w-4 h-4" />
-                <span className="hidden sm:inline">Connect Telegram</span>
+                <span className="">Connect Telegram</span>
               </a>
             )}
           </div>

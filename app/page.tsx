@@ -16,9 +16,9 @@ import { CTASection } from "@/components/landing/CTASection";
  */
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-background overflow-x-hidden">
-      {/* Global Background Elements */}
-      <div className="fixed inset-0 pointer-events-none z-0">
+    <>
+      {/* Global Background Elements - Fixed but below footer */}
+      <div className="fixed inset-0 pointer-events-none -z-10">
         <div className="absolute inset-0 bg-gradient-mesh" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(245,158,11,0.05),transparent_70%)]" />
       </div>
@@ -28,7 +28,7 @@ export default function Home() {
       <LiveActivityFeed />
 
       {/* Page Content - Ordered Sections */}
-      <main className="relative z-10">
+      <div className="relative bg-transparent">
         <HeroSection />
 
         <div className="space-y-32 pb-32">
@@ -36,7 +36,7 @@ export default function Home() {
           <ShowcaseSection />
           <CTASection />
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

@@ -145,20 +145,49 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
     setShowChainDropdown(false);
   };
 
+  // Helper to verify wallet is on correct chain with retries
+  const verifyChainConnection = async (
+    targetChainId: number,
+    maxAttempts = 10
+  ): Promise<boolean> => {
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        // Get current chain directly from provider (avoids stale React state)
+        const provider = (window as any).ethereum;
+        if (provider) {
+          const chainIdHex = await provider.request({ method: "eth_chainId" });
+          const currentChainId = parseInt(chainIdHex, 16);
+          if (currentChainId === targetChainId) {
+            return true;
+          }
+        }
+      } catch {
+        // Ignore errors, just retry
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    return false;
+  };
+
   const handleSubmit = async () => {
     if (!fromChainId || !toChainId) return;
 
-    // Check if we need to switch to the source chain
     const currentChainId = chain?.id;
 
-    if (currentChainId !== undefined && currentChainId !== fromChainId) {
+    // If not on the source chain, switch first
+    if (currentChainId === undefined || currentChainId !== fromChainId) {
       try {
         await switchChain({ chainId: fromChainId });
-        // Wait for chain switch to complete
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Wait and verify the chain actually switched
+        const switched = await verifyChainConnection(fromChainId);
+        if (!switched) {
+          console.warn("Chain switch verification timed out");
+          return;
+        }
       } catch (error) {
         console.warn("Chain switch cancelled or failed:", error);
-        return; // Don't proceed if chain switch failed
+        return;
       }
     }
 

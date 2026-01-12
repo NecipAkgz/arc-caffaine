@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Particle {
   x: number;
@@ -18,12 +18,32 @@ interface Particle {
  *
  * Canvas-based ambient particle system with mouse parallax effect.
  * Renders glowing amber orbs that float smoothly across the screen.
+ *
+ * Features:
+ * - IntersectionObserver for viewport-based animation pause
  */
 export function FloatingParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef<number | undefined>(undefined);
+  const [isVisible, setIsVisible] = useState(true);
+
+  // IntersectionObserver for viewport visibility
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -70,6 +90,12 @@ export function FloatingParticles() {
 
     // Animation loop
     const animate = () => {
+      // Pause animation when not visible
+      if (!isVisible) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle) => {
@@ -126,7 +152,7 @@ export function FloatingParticles() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, [isVisible]);
 
   return (
     <canvas

@@ -12,6 +12,8 @@ interface CreatorSearchProps {
   placeholder?: string;
   /** Auto focus on mount */
   autoFocus?: boolean;
+  /** Callback when navigation happens */
+  onNavigate?: () => void;
 }
 
 /**
@@ -24,6 +26,7 @@ export function CreatorSearch({
   variant = "hero",
   placeholder = "Search for a creator...",
   autoFocus = false,
+  onNavigate,
 }: CreatorSearchProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -42,6 +45,7 @@ export function CreatorSearch({
       router.push(`/${result.username}`);
       setQuery("");
       clearSearch();
+      onNavigate?.();
     } else {
       setShowError(true);
     }

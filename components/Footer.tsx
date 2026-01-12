@@ -5,19 +5,19 @@ export function Footer() {
       <div className="h-px bg-linear-to-r from-transparent via-primary/50 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="relative flex items-center justify-center">
-          {/* Main text - centered */}
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-4">
+          {/* Main text */}
+          <p className="text-sm text-muted-foreground order-2 md:order-1">
             Built with ☕️ on Arc Testnet
           </p>
 
-          {/* Social icons - right */}
-          <div className="absolute right-0 flex items-center gap-3">
+          {/* Social icons */}
+          <div className="flex items-center gap-4 order-1 md:order-2">
             <a
               href="https://twitter.com/LanceNeop"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-primary transition-all hover:scale-110"
+              className="text-muted-foreground hover:text-primary transition-all hover:scale-110 icon-btn p-2 rounded-full hover:bg-primary/10"
               aria-label="Twitter"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -28,7 +28,7 @@ export function Footer() {
               href="https://discord.com/users/_crokxy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-[#5865F2] transition-all hover:scale-110"
+              className="text-muted-foreground hover:text-[#5865F2] transition-all hover:scale-110 icon-btn p-2 rounded-full hover:bg-[#5865F2]/10"
               aria-label="Discord"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

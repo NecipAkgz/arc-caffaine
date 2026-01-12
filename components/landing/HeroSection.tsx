@@ -226,11 +226,10 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Refined Scroll Indicator */}
       <FadeIn
-        delay={2}
+        delay={1}
         duration={1.2}
-        className="absolute bottom-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 cursor-pointer group"
+        className="hidden md:flex absolute bottom-1 left-1/2 -translate-x-1/2 flex-col items-center gap-4 cursor-pointer group z-20"
         onClick={() =>
           window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
         }
