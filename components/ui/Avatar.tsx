@@ -1,18 +1,19 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { useAvatar, getGradientPlaceholder } from "@/hooks/useAvatar";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 /**
- * Avatar size variants.
+ * Avatar size variants with pixel values for Next.js Image.
  */
-const sizeClasses = {
-  sm: "w-6 h-6 text-[10px]",
-  md: "w-10 h-10 text-sm",
-  lg: "w-14 h-14 text-base",
-  xl: "w-20 h-20 text-xl",
+const sizeConfig = {
+  sm: { class: "w-6 h-6 text-[10px]", px: 24 },
+  md: { class: "w-10 h-10 text-sm", px: 40 },
+  lg: { class: "w-14 h-14 text-base", px: 56 },
+  xl: { class: "w-20 h-20 text-xl", px: 80 },
 } as const;
 
 /**
@@ -22,27 +23,31 @@ interface AvatarProps {
   /** Wallet address to display avatar for */
   address: string | undefined;
   /** Size variant */
-  size?: keyof typeof sizeClasses;
+  size?: keyof typeof sizeConfig;
   /** Additional CSS classes */
   className?: string;
   /** Show loading spinner while resolving */
   showLoader?: boolean;
   /** Fallback initial letter (used when no address) */
   fallbackLetter?: string;
+  /** Priority loading for above-the-fold avatars */
+  priority?: boolean;
 }
 
 /**
- * Web3 Avatar Component
+ * Web3 Avatar Component with Next.js Image Optimization
  *
  * Displays a user's avatar with automatic fallback chain:
- * 1. ENS Avatar (if available on mainnet)
+ * 1. Farcaster PFP (if available)
  * 2. Effigy.im blockie-style SVG
  * 3. Gradient placeholder generated from address
+ *
+ * Uses Next.js Image for automatic WebP conversion and size optimization.
  *
  * @example
  * ```tsx
  * <Avatar address="0x..." size="md" />
- * <Avatar address={memo.from} size="sm" />
+ * <Avatar address={memo.from} size="sm" priority />
  * ```
  */
 export function Avatar({
@@ -51,9 +56,12 @@ export function Avatar({
   className,
   showLoader = false,
   fallbackLetter,
+  priority = false,
 }: AvatarProps) {
   const { avatarUrl, source, isLoading } = useAvatar(address);
   const [imageError, setImageError] = React.useState(false);
+
+  const { class: sizeClass, px } = sizeConfig[size];
 
   // Reset error state when address changes
   React.useEffect(() => {
@@ -74,7 +82,7 @@ export function Avatar({
       <div
         className={cn(
           "rounded-full flex items-center justify-center bg-secondary/50 border border-border/50",
-          sizeClasses[size],
+          sizeClass,
           className
         )}
       >
@@ -88,16 +96,21 @@ export function Avatar({
     return (
       <div
         className={cn(
-          "rounded-full overflow-hidden border border-border/50 shrink-0",
-          sizeClasses[size],
+          "rounded-full overflow-hidden border border-border/50 shrink-0 relative",
+          sizeClass,
           className
         )}
       >
-        <img
+        <Image
           src={avatarUrl}
           alt="Avatar"
+          width={px}
+          height={px}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}
+          priority={priority}
+          unoptimized={avatarUrl.endsWith(".svg")}
+          loading={priority ? undefined : "lazy"}
         />
       </div>
     );
@@ -111,7 +124,7 @@ export function Avatar({
     <div
       className={cn(
         "rounded-full flex items-center justify-center font-bold text-white/90 border border-white/10 shrink-0",
-        sizeClasses[size],
+        sizeClass,
         className
       )}
       style={gradientStyle}
