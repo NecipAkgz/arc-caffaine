@@ -39,8 +39,10 @@ import {
   getAverageDonation,
   getTopSupporters,
   getSupportersOverTime,
+  getTotalEarnings,
 } from "@/lib/analytics";
 import { SupporterChart } from "@/components/SupporterChart";
+import { AIInsights } from "@/components/AIInsights";
 import { Users, TrendingUp, Trophy } from "lucide-react";
 
 /**
@@ -464,6 +466,29 @@ export default function Dashboard() {
                 <SupporterChart data={getSupportersOverTime(memos)} />
               </div>
             </div>
+
+            {/* AI Insights */}
+            <AIInsights
+              userAddress={address || ""}
+              memoData={{
+                totalDonations: memos.length,
+                uniqueSupporters: getUniqueSupporterCount(memos),
+                averageDonation: getAverageDonation(memos),
+                totalEarnings: getTotalEarnings(memos),
+                topSupporter: getTopSupporters(memos, 1)[0]
+                  ? {
+                      name: getTopSupporters(memos, 1)[0].name || "Anonymous",
+                      amount: getTopSupporters(memos, 1)[0].totalAmount,
+                    }
+                  : undefined,
+                recentActivity: getSupportersOverTime(memos)
+                  .slice(-7)
+                  .map((d) => ({
+                    date: d.date,
+                    count: d.cumulativeSupporters,
+                  })),
+              }}
+            />
           </div>
         </FadeIn>
 
