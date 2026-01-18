@@ -43,3 +43,9 @@ next-env.d.ts
 # hardhat
 artifacts/
 cache/
+
+# agent
+.agent/
+.shared/
+.gsd/
+.gemini/

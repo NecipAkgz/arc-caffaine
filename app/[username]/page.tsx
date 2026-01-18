@@ -89,7 +89,7 @@ export default function PublicProfile() {
         chain: arcTestnet,
         transport: http(),
       }),
-    []
+    [],
   );
   const [showBridgeModal, setShowBridgeModal] = useState(false);
 
@@ -130,10 +130,10 @@ export default function PublicProfile() {
         args: [addr],
       })) as Memo[];
       return [...data].sort(
-        (a, b) => Number(b.timestamp) - Number(a.timestamp)
+        (a, b) => Number(b.timestamp) - Number(a.timestamp),
       );
     },
-    [publicClient]
+    [publicClient],
   );
 
   useEffect(() => {
@@ -269,9 +269,9 @@ export default function PublicProfile() {
             {/* Profile Card with Badge */}
             <FadeIn delay={0.2} direction="down">
               <div className="relative pt-14">
-                {/* Avatar - Overflowing top */}
+                {/* Avatar - Overflowing top with glow ring */}
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10">
-                  <div className="w-24 h-24 shadow-xl rounded-full overflow-hidden bg-background">
+                  <div className="w-24 h-24 shadow-xl rounded-full overflow-hidden bg-background avatar-glow-ring">
                     <Avatar
                       address={recipientAddress || undefined}
                       size="xl"
@@ -280,42 +280,45 @@ export default function PublicProfile() {
                   </div>
                 </div>
 
-                {/* Card Body */}
-                <div className="glass-card overflow-hidden shadow-2xl relative group">
-                  <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Card Body with Animated Gradient Border */}
+                <div className="gradient-border-animated">
+                  <div className="glass-card-premium overflow-hidden relative group">
+                    <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                  {/* Content */}
-                  <div className="relative pt-16 pb-6 px-8 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                      @{username}
-                    </h1>
-                    {bio && (
-                      <p className="text-muted-foreground mt-3 leading-relaxed">
-                        {bio}
-                      </p>
+                    {/* Content */}
+                    <div className="relative pt-16 pb-6 px-8 text-center">
+                      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                        @{username}
+                      </h1>
+                      {bio && (
+                        <p className="text-muted-foreground mt-3 leading-relaxed">
+                          {bio}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Badge Section - Full Width Bottom */}
+                    {isConnected && recipientAddress && (
+                      <div className="px-4 pb-4">
+                        <SupporterBadgeSection
+                          creatorAddress={recipientAddress}
+                          creatorUsername={username}
+                          hasDonated={memos.some(
+                            (memo) =>
+                              memo.from.toLowerCase() ===
+                              address?.toLowerCase(),
+                          )}
+                        />
+                      </div>
                     )}
                   </div>
-
-                  {/* Badge Section - Full Width Bottom */}
-                  {isConnected && recipientAddress && (
-                    <div className="px-4 pb-4">
-                      <SupporterBadgeSection
-                        creatorAddress={recipientAddress}
-                        creatorUsername={username}
-                        hasDonated={memos.some(
-                          (memo) =>
-                            memo.from.toLowerCase() === address?.toLowerCase()
-                        )}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
             </FadeIn>
 
-            {/* Donation Card */}
+            {/* Donation Card with Premium Effects */}
             <FadeIn delay={0.4} direction="up">
-              <div className="glass-card p-8 shadow-2xl">
+              <div className="glass-card-premium p-8 neon-glow-primary-hover">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
                     <Sparkles className="w-5 h-5 text-primary" />
@@ -341,7 +344,7 @@ export default function PublicProfile() {
                           "relative py-2 rounded-xl border transition-all duration-200 font-medium overflow-hidden group",
                           amount === val
                             ? "bg-primary text-primary-foreground border-primary shadow-[0_0_20px_rgba(245,158,11,0.3)]"
-                            : "bg-secondary/40 border-border/50 hover:bg-secondary/60 hover:border-border text-muted-foreground"
+                            : "bg-secondary/40 border-border/50 hover:bg-secondary/60 hover:border-border text-muted-foreground",
                         )}
                       >
                         <span className="relative z-10">{val} USDC</span>
@@ -393,7 +396,7 @@ export default function PublicProfile() {
                         <button
                           type="submit"
                           disabled={actionLoading}
-                          className="w-full bg-linear-to-r from-primary to-orange-400 hover:from-primary/90 hover:to-orange-500/90 text-primary-foreground py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2 group cursor-pointer"
+                          className="w-full bg-linear-to-r from-primary to-orange-400 hover:from-primary/90 hover:to-orange-500/90 text-primary-foreground py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2 group cursor-pointer btn-primary-glow neon-glow-primary-hover"
                         >
                           {actionLoading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -470,7 +473,7 @@ export default function PublicProfile() {
                   {memos.map((memo, i) => (
                     <div
                       key={`${memo.timestamp}-${memo.from}`}
-                      className="glass-card p-6 transition-all hover:border-primary/20 group"
+                      className={`glass-card p-6 card-lift group animate-fade-in-up ${i < 5 ? `stagger-${i + 1}` : ""}`}
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
@@ -481,12 +484,12 @@ export default function PublicProfile() {
                             </p>
                             <p className="text-xs text-muted-foreground">
                               {new Date(
-                                Number(memo.timestamp) * 1000
+                                Number(memo.timestamp) * 1000,
                               ).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
-                        <div className="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-xs font-bold border border-green-500/20">
+                        <div className="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-xs font-bold border border-green-500/20 transition-all neon-glow-success-hover">
                           +{formatEther(memo.amount)} USDC
                         </div>
                       </div>
