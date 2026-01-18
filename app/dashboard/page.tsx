@@ -34,6 +34,14 @@ import {
 } from "@/components/animations";
 import { Memo } from "@/lib/types";
 import { logger } from "@/lib/logger";
+import {
+  getUniqueSupporterCount,
+  getAverageDonation,
+  getTopSupporters,
+  getSupportersOverTime,
+} from "@/lib/analytics";
+import { SupporterChart } from "@/components/SupporterChart";
+import { Users, TrendingUp, Trophy } from "lucide-react";
 
 /**
  * User Dashboard Component
@@ -51,7 +59,7 @@ export default function Dashboard() {
         chain: arcTestnet,
         transport: http(),
       }),
-    []
+    [],
   );
 
   const {
@@ -95,7 +103,7 @@ export default function Dashboard() {
         if (!isMounted) return;
         // Sort by timestamp desc
         const sorted = [...(data as Memo[])].sort(
-          (a, b) => Number(b.timestamp) - Number(a.timestamp)
+          (a, b) => Number(b.timestamp) - Number(a.timestamp),
         );
         setMemos(sorted);
       } catch (e) {
@@ -111,7 +119,7 @@ export default function Dashboard() {
       if (!address) return;
       try {
         const response = await fetch(
-          `/api/telegram/status?address=${address.toLowerCase()}`
+          `/api/telegram/status?address=${address.toLowerCase()}`,
         );
         const data = await response.json();
         setTelegramConnected(data.connected);
@@ -260,9 +268,9 @@ export default function Dashboard() {
                 </button>
                 <a
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                    "Support my creative journey on Arc Caffeine! ☕✨\n\nSend USDC & Mint my Supporter NFT on @Arc Testnet 👇\n\n"
+                    "Support my creative journey on Arc Caffeine! ☕✨\n\nSend USDC & Mint my Supporter NFT on @Arc Testnet 👇\n\n",
                   )}&url=${encodeURIComponent(
-                    username ? `${window.location.origin}/${username}` : ""
+                    username ? `${window.location.origin}/${username}` : "",
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -377,6 +385,88 @@ export default function Dashboard() {
           </div>
         </Stagger>
 
+        {/* Analytics Section */}
+        <FadeIn delay={0.8}>
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <TrendingUp className="w-6 h-6" />
+              Analytics
+            </h2>
+
+            {/* Analytics Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Unique Supporters */}
+              <div className="bg-secondary/30 border border-border rounded-xl p-5">
+                <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                  <Users className="w-4 h-4" />
+                  <span className="text-sm font-medium">Unique Supporters</span>
+                </div>
+                <CountUp
+                  end={getUniqueSupporterCount(memos)}
+                  decimals={0}
+                  duration={2}
+                  className="text-3xl font-bold"
+                />
+              </div>
+
+              {/* Average Donation */}
+              <div className="bg-secondary/30 border border-border rounded-xl p-5">
+                <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                  <DollarSign className="w-4 h-4" />
+                  <span className="text-sm font-medium">Avg. Donation</span>
+                </div>
+                <CountUp
+                  end={getAverageDonation(memos)}
+                  decimals={2}
+                  duration={2}
+                  className="text-3xl font-bold"
+                  suffix=" USDC"
+                />
+              </div>
+
+              {/* Top Supporter */}
+              <div className="bg-secondary/30 border border-border rounded-xl p-5">
+                <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                  <Trophy className="w-4 h-4" />
+                  <span className="text-sm font-medium">Top Supporter</span>
+                </div>
+                {getTopSupporters(memos, 1)[0] ? (
+                  <div className="flex items-center gap-2">
+                    <Avatar
+                      address={
+                        getTopSupporters(memos, 1)[0].address as `0x${string}`
+                      }
+                      size="sm"
+                    />
+                    <div>
+                      <p className="font-bold text-lg">
+                        {getTopSupporters(memos, 1)[0].name?.trim() ||
+                          `${getTopSupporters(memos, 1)[0].address.slice(0, 6)}...`}
+                      </p>
+                      <p className="text-xs text-green-500">
+                        {getTopSupporters(memos, 1)[0].totalAmount.toFixed(2)}{" "}
+                        USDC
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">No supporters yet</p>
+                )}
+              </div>
+            </div>
+
+            {/* Supporter Growth Chart */}
+            <div className="bg-secondary/30 border border-border rounded-2xl p-6">
+              <h3 className="text-lg font-medium text-muted-foreground mb-4">
+                Supporter Growth
+              </h3>
+              <div className="h-[300px]">
+                <SupporterChart data={getSupportersOverTime(memos)} />
+              </div>
+            </div>
+          </div>
+        </FadeIn>
+
         {/* History */}
         <div className="space-y-4">
           <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -410,7 +500,7 @@ export default function Dashboard() {
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {new Date(
-                              Number(memo.timestamp) * 1000
+                              Number(memo.timestamp) * 1000,
                             ).toLocaleDateString()}
                           </span>
                         </div>
