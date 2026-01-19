@@ -4,9 +4,16 @@ import {
   generateInsights,
   parseInsightsResponse,
 } from "@/lib/gemini";
-import { checkRateLimit, getClientIP } from "@/lib/rateLimit";
+import { createRateLimiter, getClientIP } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
+
+// Rate limiter: 5 min cooldown, 100/week
+const limiter = createRateLimiter({
+  namespace: "insights",
+  cooldownMs: 5 * 60 * 1000,
+  weeklyLimit: 100,
+});
 
 /**
  * POST /api/insights
@@ -17,7 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     // Check rate limit
     const clientIP = getClientIP(request);
-    const rateLimit = checkRateLimit(clientIP);
+    const rateLimit = limiter.check(clientIP);
 
     if (!rateLimit.allowed) {
       return NextResponse.json(

@@ -81,6 +81,8 @@ export default function PublicProfile() {
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState("5");
   const [newMemoKey, setNewMemoKey] = useState(0);
+  const [generatingMessage, setGeneratingMessage] = useState(false);
+  const [messageError, setMessageError] = useState<string | null>(null);
 
   // Memoized public client to avoid recreation on each render
   const publicClient = useMemo(
@@ -381,12 +383,58 @@ export default function PublicProfile() {
                       className="w-full bg-secondary/30 border border-border/50 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/50 text-foreground"
                       placeholder="Name or @twitter (optional)"
                     />
-                    <textarea
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      className="w-full bg-secondary/30 border border-border/50 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all min-h-[100px] resize-none placeholder:text-muted-foreground/50 text-foreground"
-                      placeholder="Say something nice..."
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        className="w-full bg-secondary/30 border border-border/50 rounded-xl px-4 py-3.5 pr-12 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all min-h-[110px] resize-none placeholder:text-muted-foreground/50 text-foreground"
+                        placeholder="Say something nice..."
+                      />
+                      <button
+                        type="button"
+                        disabled={generatingMessage}
+                        onClick={async () => {
+                          setGeneratingMessage(true);
+                          setMessageError(null);
+                          try {
+                            const res = await fetch("/api/generate-message", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                creatorName: username,
+                                amount,
+                              }),
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              setMessage(data.message);
+                            } else {
+                              setMessageError(
+                                data.error || "Failed to generate",
+                              );
+                            }
+                          } catch (e) {
+                            console.error("Failed to generate message", e);
+                            setMessageError("Failed to generate message");
+                          } finally {
+                            setGeneratingMessage(false);
+                          }
+                        }}
+                        className="absolute bottom-3 right-3 p-2 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary transition-all disabled:opacity-50 cursor-pointer"
+                        title="Generate AI message"
+                      >
+                        {generatingMessage ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                    {messageError && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {messageError}
+                      </p>
+                    )}
                   </div>
 
                   {/* Actions */}
