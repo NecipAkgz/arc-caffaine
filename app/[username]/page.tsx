@@ -66,7 +66,7 @@ const ERC20_ABI = [
  */
 export default function PublicProfile() {
   const params = useParams();
-  const username = params.username as string;
+  const username = decodeURIComponent(params.username as string);
   const { isConnected, address } = useAccount();
   const { buyCoffee, loading: actionLoading } = useArcCaffeine();
 

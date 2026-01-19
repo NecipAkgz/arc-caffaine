@@ -1,13 +1,15 @@
 "use client";
 
 import { FadeIn, Stagger, Typewriter } from "@/components/animations";
-import { Sparkles, ArrowRight, Coffee, Loader2 } from "lucide-react";
+import { Sparkles, ArrowRight, Coffee, Loader2, RefreshCw } from "lucide-react";
 import { CustomConnectButton } from "@/components/CustomConnectButton";
 import { CreatorSearch } from "@/components/CreatorSearch";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useArcCaffeine } from "@/hooks/useArcCaffeine";
 import { useRegisterForm } from "@/hooks/useRegisterForm";
+import { useState, useEffect, useCallback } from "react";
+import { getRandomCreators } from "@/lib/getCreators";
 
 export function HeroSection() {
   const { isConnected, address } = useAccount();
@@ -22,6 +24,37 @@ export function HeroSection() {
     error,
     handleSubmit,
   } = useRegisterForm();
+
+  // Discover Creators state
+  const [creators, setCreators] = useState<string[]>([]);
+  const [creatorsLoading, setCreatorsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchCreators = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) setRefreshing(true);
+      else setCreatorsLoading(true);
+
+      try {
+        // Pass forceRefresh=true when user clicks refresh to bypass localStorage cache
+        const randomCreators = await getRandomCreators(4, isRefresh);
+        // Filter out current user from the list
+        setCreators(randomCreators.filter((c) => c !== username));
+      } catch (error) {
+        console.error("Failed to fetch creators:", error);
+      } finally {
+        setCreatorsLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [username],
+  );
+
+  useEffect(() => {
+    if (isRegistered) {
+      fetchCreators();
+    }
+  }, [isRegistered, fetchCreators]);
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-20">
@@ -129,52 +162,139 @@ export function HeroSection() {
                     </p>
                   </div>
                 ) : isRegistered ? (
-                  <div className="space-y-9 text-center">
-                    <div className="flex flex-col items-center gap-5">
-                      {/* Avatar Circle */}
-                      <div className="relative group/avatar cursor-default">
-                        {/* Glow effect */}
-                        <div className="absolute inset-0 bg-green-500/20 rounded-full blur-2xl group-hover/avatar:bg-green-500/30 transition-all duration-500" />
+                  <div className="space-y-6">
+                    {/* User Profile - Header with Quick Dashboard Access */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        {/* Avatar Circle */}
+                        <div className="relative group/avatar cursor-default shrink-0">
+                          {/* Glow effect */}
+                          <div className="absolute inset-0 bg-green-500/20 rounded-full blur-xl group-hover/avatar:bg-green-500/30 transition-all duration-500" />
 
-                        {/* Main Container */}
-                        <div className="w-26 h-26 rounded-full bg-black/40 border border-white/10 flex items-center justify-center relative z-10 backdrop-blur-sm shadow-2xl">
-                          <div className="w-full h-full rounded-full border-4 border-black/20 flex items-center justify-center bg-linear-to-br from-green-500/10 to-transparent">
-                            <Coffee className="w-11 h-11 text-green-400 drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" />
+                          {/* Main Container */}
+                          <div className="w-14 h-14 rounded-full bg-black/40 border border-white/10 flex items-center justify-center relative z-10 backdrop-blur-sm shadow-2xl">
+                            <div className="w-full h-full rounded-full border-2 border-black/20 flex items-center justify-center bg-linear-to-br from-green-500/10 to-transparent">
+                              <Coffee className="w-6 h-6 text-green-400 drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" />
+                            </div>
+                          </div>
+
+                          {/* Status Indicator */}
+                          <div className="absolute bottom-0 right-0 w-4.5 h-4.5 bg-[#0a0a0a] rounded-full flex items-center justify-center z-20 border border-white/5">
+                            <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
                           </div>
                         </div>
 
-                        {/* Status Indicator */}
-                        <div className="absolute bottom-1 right-1 w-7.5 h-7.5 bg-[#0a0a0a] rounded-full flex items-center justify-center z-20 border border-white/5">
-                          <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                        {/* Username and Status */}
+                        <div className="flex flex-col items-start gap-1">
+                          <div className="inline-flex items-center gap-2">
+                            <span className="text-xl font-black text-white tracking-tight">
+                              @{username}
+                            </span>
+                            <span
+                              className="flex items-center justify-center w-4 h-4 rounded-full bg-blue-500 text-[8px] text-white font-bold shadow-lg shadow-blue-500/20"
+                              title="Verified"
+                            >
+                              ✓
+                            </span>
+                          </div>
+                          <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-500/80" />
+                            Live on Arc
+                          </span>
                         </div>
                       </div>
 
-                      <div className="space-y-3 max-w-[260px]">
-                        <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/5 mx-auto transition-colors hover:bg-white/10 hover:border-white/10">
-                          <span className="text-2xl font-bold text-white tracking-tight">
-                            @{username}
-                          </span>
-                          <span
-                            className="flex items-center justify-center w-4.5 h-4.5 rounded-full bg-blue-500 text-[9px] text-white font-bold shadow-lg shadow-blue-500/20"
-                            title="Verified"
-                          >
-                            ✓
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground/80 font-medium leading-relaxed">
-                          Your profile is publicly visible and active on Arc
-                          Testnet.
-                        </p>
-                      </div>
+                      {/* Quick Dashboard Link */}
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 hover:bg-white/8 transition-all group/dash"
+                      >
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground group-hover/dash:text-foreground">
+                          Dashboard
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover/dash:text-primary transition-transform group-hover/dash:translate-x-0.5" />
+                      </Link>
                     </div>
 
-                    <Link
-                      href="/dashboard"
-                      className="group/btn relative flex items-center justify-center gap-3 w-full bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-4 rounded-xl text-lg font-bold transition-all hover:shadow-[0_0_20px_-5px_rgba(245,158,11,0.3)]"
-                    >
-                      Go to Dashboard{" "}
-                      <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                    </Link>
+                    {/* Divider */}
+                    <div className="h-px bg-white/5" />
+
+                    {/* Discover Creators List */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          Discover Creators
+                        </h3>
+                        <button
+                          onClick={() => fetchCreators(true)}
+                          disabled={refreshing}
+                          className="p-1.5 hover:bg-white/5 rounded-lg transition text-muted-foreground hover:text-foreground disabled:opacity-50 cursor-pointer"
+                          title="Refresh"
+                        >
+                          <RefreshCw
+                            className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`}
+                          />
+                        </button>
+                      </div>
+
+                      {creatorsLoading ? (
+                        <div className="py-8 flex items-center justify-center">
+                          <Loader2 className="w-6 h-6 animate-spin text-primary/60" />
+                        </div>
+                      ) : creators.length === 0 ? (
+                        <div className="py-8 text-center bg-white/2 rounded-2xl border border-white/5">
+                          <p className="text-sm text-muted-foreground">
+                            No other creators yet
+                          </p>
+                        </div>
+                      ) : (
+                        <Stagger
+                          staggerDelay={0.08}
+                          initialDelay={0.1}
+                          duration={0.5}
+                          className="grid gap-2"
+                        >
+                          {creators.slice(0, 4).map((creatorName) => {
+                            // Generate a consistent pseudo-random color based on name
+                            const colors = [
+                              "from-blue-500/20 to-indigo-500/10 text-blue-400",
+                              "from-purple-500/20 to-pink-500/10 text-purple-400",
+                              "from-amber-500/20 to-orange-500/10 text-amber-400",
+                              "from-emerald-500/20 to-teal-500/10 text-emerald-400",
+                            ];
+                            const colorClass =
+                              colors[creatorName.length % colors.length];
+
+                            return (
+                              <Link
+                                key={creatorName}
+                                href={`/${creatorName}`}
+                                className="group/item flex items-center gap-3 p-3 rounded-2xl bg-white/3 border border-white/5 hover:bg-white/8 hover:border-white/12 transition-all duration-300 transform hover:-translate-y-0.5"
+                              >
+                                <div
+                                  className={`w-10 h-10 rounded-xl bg-linear-to-br ${colorClass.split(" ").slice(0, 2).join(" ")} flex items-center justify-center shrink-0 shadow-lg group-hover/item:scale-110 transition-transform duration-300`}
+                                >
+                                  <Coffee
+                                    className={`w-4.5 h-4.5 ${colorClass.split(" ").pop()}`}
+                                  />
+                                </div>
+                                <div className="flex-1 overflow-hidden text-left">
+                                  <p className="font-semibold text-sm text-foreground/90 group-hover/item:text-primary transition-colors truncate">
+                                    @{creatorName}
+                                  </p>
+                                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold opacity-60">
+                                    View Profile
+                                  </p>
+                                </div>
+                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all duration-300 -translate-x-2 group-hover/item:translate-x-0">
+                                  <ArrowRight className="w-4 h-4 text-primary" />
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </Stagger>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">

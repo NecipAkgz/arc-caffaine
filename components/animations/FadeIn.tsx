@@ -52,12 +52,17 @@ export function FadeIn({
         duration,
         delay,
         ease: "power3.out",
-      }
+      },
     );
   }, [delay, duration, direction]);
 
   return (
-    <div ref={elementRef} className={className} {...props}>
+    <div
+      ref={elementRef}
+      className={className}
+      style={{ opacity: 0 }}
+      {...props}
+    >
       {children}
     </div>
   );

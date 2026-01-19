@@ -44,7 +44,6 @@ export function Typewriter({ phrases, className = "" }: TypewriterProps) {
         opacity: 0,
         y: 30,
         scale: 0.9,
-        filter: "blur(10px)",
       });
 
       // Staggered reveal animation with spring-like ease
@@ -52,11 +51,10 @@ export function Typewriter({ phrases, className = "" }: TypewriterProps) {
         opacity: 1,
         y: 0,
         scale: 1,
-        filter: "blur(0px)",
-        duration: 1.2,
-        stagger: 0.25,
-        delay: 0.8,
-        ease: "power3.out",
+        duration: 1.32,
+        stagger: 0.19,
+        delay: 0.4,
+        ease: "back.out(1.7)",
         onComplete: () => {
           // Add subtle breathing glow to keywords
           const keywords = words.filter((_, i) => allWords[i]?.isKeyword);
@@ -70,7 +68,7 @@ export function Typewriter({ phrases, className = "" }: TypewriterProps) {
         },
       });
     },
-    { dependencies: [isReady], scope: containerRef }
+    { dependencies: [isReady], scope: containerRef },
   );
 
   return (
@@ -85,6 +83,11 @@ export function Typewriter({ phrases, className = "" }: TypewriterProps) {
             key={index}
             ref={(el) => {
               wordsRef.current[index] = el;
+            }}
+            style={{
+              opacity: 0,
+              transform: "translateY(20px) scale(0.95)",
+              willChange: "opacity, transform",
             }}
             className={`inline-block mr-[0.35em] ${
               word.isKeyword
