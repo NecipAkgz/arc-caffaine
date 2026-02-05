@@ -36,8 +36,8 @@ export function HeroSection() {
       else setCreatorsLoading(true);
 
       try {
-        // Pass forceRefresh=true when user clicks refresh to bypass localStorage cache
-        const randomCreators = await getRandomCreators(4, isRefresh);
+        // Server-side cache handles refresh - just fetch fresh data
+        const randomCreators = await getRandomCreators(4);
         // Filter out current user from the list
         setCreators(randomCreators.filter((c) => c !== username));
       } catch (error) {
