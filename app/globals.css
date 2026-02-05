@@ -121,6 +121,16 @@ body {
   background: hsl(240 5% 30%);
 }
 
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
 /* Glassmorphism Card (Updated for new theme) */
 .glass-card {
   background: hsla(240, 10%, 6%, 0.6);

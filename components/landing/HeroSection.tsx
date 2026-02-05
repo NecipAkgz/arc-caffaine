@@ -248,13 +248,8 @@ export function HeroSection() {
                           </p>
                         </div>
                       ) : (
-                        <Stagger
-                          staggerDelay={0.08}
-                          initialDelay={0.1}
-                          duration={0.5}
-                          className="grid gap-2"
-                        >
-                          {creators.slice(0, 4).map((creatorName) => {
+                        <div className="grid gap-2">
+                          {creators.slice(0, 4).map((creatorName, index) => {
                             // Generate a consistent pseudo-random color based on name
                             const colors = [
                               "from-blue-500/20 to-indigo-500/10 text-blue-400",
@@ -269,7 +264,8 @@ export function HeroSection() {
                               <Link
                                 key={creatorName}
                                 href={`/${creatorName}`}
-                                className="group/item flex items-center gap-3 p-3 rounded-2xl bg-white/3 border border-white/5 hover:bg-white/8 hover:border-white/12 transition-all duration-300 transform hover:-translate-y-0.5"
+                                className="group/item flex items-center gap-3 p-3 rounded-2xl bg-white/3 border border-white/5 hover:bg-white/8 hover:border-white/12 transition-all duration-300 transform hover:-translate-y-0.5 animate-fade-in-up"
+                                style={{ animationDelay: `${index * 100}ms` }}
                               >
                                 <div
                                   className={`w-10 h-10 rounded-xl bg-linear-to-br ${colorClass.split(" ").slice(0, 2).join(" ")} flex items-center justify-center shrink-0 shadow-lg group-hover/item:scale-110 transition-transform duration-300`}
@@ -292,7 +288,7 @@ export function HeroSection() {
                               </Link>
                             );
                           })}
-                        </Stagger>
+                        </div>
                       )}
                     </div>
                   </div>

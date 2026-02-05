@@ -45,6 +45,9 @@ export function Stagger({
     // Set container to visible first
     gsap.set(containerRef.current, { opacity: 1 });
 
+    // Set will-change for better GPU acceleration
+    gsap.set(childElements, { willChange: "transform, opacity" });
+
     gsap.fromTo(
       childElements,
       {
@@ -58,7 +61,11 @@ export function Stagger({
         duration,
         delay: initialDelay,
         stagger: staggerDelay,
-        ease: "power2.out",
+        ease: "power3.out",
+        onComplete: () => {
+          // Clean up will-change after animation
+          gsap.set(childElements, { willChange: "auto" });
+        },
       },
     );
   }, [staggerDelay, initialDelay, duration, direction]);

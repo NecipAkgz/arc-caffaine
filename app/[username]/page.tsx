@@ -500,7 +500,7 @@ export default function PublicProfile() {
             </FadeIn>
 
             <div
-              className={`space-y-4 lg:max-h-[calc(100vh-30rem)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent hover:scrollbar-thumb-primary/40 transition-colors`}
+              className={`space-y-4 lg:max-h-[calc(100vh-30rem)] overflow-y-auto pr-2 scrollbar-none`}
             >
               {memos.length === 0 ? (
                 <FadeIn delay={0.8} direction="up">
