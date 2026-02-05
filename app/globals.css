@@ -725,19 +725,3 @@ body {
   animation: fade-in-up 0.4s ease-out forwards;
   opacity: 0;
 }
-
-/* ========== Accessibility: Reduced Motion ========== */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  .gradient-border-animated::before {
-    animation: none;
-    background: linear-gradient(135deg, hsl(35 90% 50%), hsl(280 60% 50%));
-  }
-}
