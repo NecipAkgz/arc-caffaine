@@ -213,6 +213,46 @@ export default function Dashboard() {
     }
   }, [loading, checkingRegistration, isRegistered, router, address]);
 
+  // Memoize expensive analytics calculations
+  const uniqueSupporterCount = useMemo(
+    () => getUniqueSupporterCount(memos),
+    [memos],
+  );
+  const averageDonation = useMemo(() => getAverageDonation(memos), [memos]);
+  const topSupporters = useMemo(() => getTopSupporters(memos, 1), [memos]);
+  const supportersOverTime = useMemo(
+    () => getSupportersOverTime(memos),
+    [memos],
+  );
+  const totalEarnings = useMemo(() => getTotalEarnings(memos), [memos]);
+
+  const memoData = useMemo(
+    () => ({
+      totalDonations: memos.length,
+      uniqueSupporters: uniqueSupporterCount,
+      averageDonation: averageDonation,
+      totalEarnings: totalEarnings,
+      topSupporter: topSupporters[0]
+        ? {
+            name: topSupporters[0].name || "Anonymous",
+            amount: topSupporters[0].totalAmount,
+          }
+        : undefined,
+      recentActivity: supportersOverTime.slice(-7).map((d) => ({
+        date: d.date,
+        count: d.cumulativeSupporters,
+      })),
+    }),
+    [
+      memos.length,
+      uniqueSupporterCount,
+      averageDonation,
+      totalEarnings,
+      topSupporters,
+      supportersOverTime,
+    ],
+  );
+
   if (loading || checkingRegistration) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -404,7 +444,7 @@ export default function Dashboard() {
                   <span className="text-sm font-medium">Unique Supporters</span>
                 </div>
                 <CountUp
-                  end={getUniqueSupporterCount(memos)}
+                  end={uniqueSupporterCount}
                   decimals={0}
                   duration={2}
                   className="text-3xl font-bold"
@@ -418,7 +458,7 @@ export default function Dashboard() {
                   <span className="text-sm font-medium">Avg. Donation</span>
                 </div>
                 <CountUp
-                  end={getAverageDonation(memos)}
+                  end={averageDonation}
                   decimals={2}
                   duration={2}
                   className="text-3xl font-bold"
@@ -432,22 +472,19 @@ export default function Dashboard() {
                   <Trophy className="w-4 h-4" />
                   <span className="text-sm font-medium">Top Supporter</span>
                 </div>
-                {getTopSupporters(memos, 1)[0] ? (
+                {topSupporters[0] ? (
                   <div className="flex items-center gap-2">
                     <Avatar
-                      address={
-                        getTopSupporters(memos, 1)[0].address as `0x${string}`
-                      }
+                      address={topSupporters[0].address as `0x${string}`}
                       size="sm"
                     />
                     <div>
                       <p className="font-bold text-lg">
-                        {getTopSupporters(memos, 1)[0].name?.trim() ||
-                          `${getTopSupporters(memos, 1)[0].address.slice(0, 6)}...`}
+                        {topSupporters[0].name?.trim() ||
+                          `${topSupporters[0].address.slice(0, 6)}...`}
                       </p>
                       <p className="text-xs text-green-500">
-                        {getTopSupporters(memos, 1)[0].totalAmount.toFixed(2)}{" "}
-                        USDC
+                        {topSupporters[0].totalAmount.toFixed(2)} USDC
                       </p>
                     </div>
                   </div>
@@ -463,32 +500,12 @@ export default function Dashboard() {
                 Supporter Growth
               </h3>
               <div className="h-[300px]">
-                <SupporterChart data={getSupportersOverTime(memos)} />
+                <SupporterChart data={supportersOverTime} />
               </div>
             </div>
 
             {/* AI Insights */}
-            <AIInsights
-              userAddress={address || ""}
-              memoData={{
-                totalDonations: memos.length,
-                uniqueSupporters: getUniqueSupporterCount(memos),
-                averageDonation: getAverageDonation(memos),
-                totalEarnings: getTotalEarnings(memos),
-                topSupporter: getTopSupporters(memos, 1)[0]
-                  ? {
-                      name: getTopSupporters(memos, 1)[0].name || "Anonymous",
-                      amount: getTopSupporters(memos, 1)[0].totalAmount,
-                    }
-                  : undefined,
-                recentActivity: getSupportersOverTime(memos)
-                  .slice(-7)
-                  .map((d) => ({
-                    date: d.date,
-                    count: d.cumulativeSupporters,
-                  })),
-              }}
-            />
+            <AIInsights userAddress={address || ""} memoData={memoData} />
           </div>
         </FadeIn>
 

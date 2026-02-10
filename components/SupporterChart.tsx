@@ -13,6 +13,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { memo } from "react";
 
 // Register Chart.js components
 ChartJS.register(
@@ -34,7 +35,9 @@ interface SupporterChartProps {
  * Line chart component displaying supporter growth over time.
  * Uses Chart.js with ArcCaffeine theme colors.
  */
-export function SupporterChart({ data }: SupporterChartProps) {
+export const SupporterChart = memo(function SupporterChart({
+  data,
+}: SupporterChartProps) {
   const chartData = {
     labels: data.map((d) => {
       // Format date as "Jan 15" style
@@ -120,4 +123,4 @@ export function SupporterChart({ data }: SupporterChartProps) {
   }
 
   return <Line data={chartData} options={options} />;
-}
+});
