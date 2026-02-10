@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
+import { useState, useRef, useEffect, KeyboardEvent, useId } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, X, AlertCircle } from "lucide-react";
 import { useCreatorSearch } from "@/hooks/useCreatorSearch";
@@ -33,6 +33,7 @@ export function CreatorSearch({
   const [query, setQuery] = useState("");
   const [showError, setShowError] = useState(false);
   const { searchCreator, loading, error, clearSearch } = useCreatorSearch();
+  const errorId = useId();
 
   // Handle search
   const handleSearch = async () => {
@@ -100,15 +101,17 @@ export function CreatorSearch({
         `}
       >
         {/* Search Icon / Loader */}
-        <div className="shrink-0">
+        <div className="shrink-0" role="status" aria-live="polite">
           {loading ? (
             <Loader2
+              aria-label="Searching..."
               className={`animate-spin text-primary ${
                 isHero ? "w-5 h-5" : "w-4 h-4"
               }`}
             />
           ) : (
             <Search
+              aria-hidden="true"
               className={`text-muted-foreground ${
                 isHero ? "w-5 h-5" : "w-4 h-4"
               }`}
@@ -120,6 +123,10 @@ export function CreatorSearch({
         <input
           ref={inputRef}
           type="text"
+          inputMode="search"
+          aria-label={placeholder}
+          aria-invalid={showError && !!error}
+          aria-describedby={showError && error ? errorId : undefined}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -144,9 +151,10 @@ export function CreatorSearch({
             }}
             className="shrink-0 p-1 rounded-full hover:bg-border/50 transition-colors"
             type="button"
-            aria-label="Clear"
+            aria-label="Clear search query"
           >
             <X
+              aria-hidden="true"
               className={`text-muted-foreground ${
                 isHero ? "w-4 h-4" : "w-3 h-3"
               }`}
@@ -167,6 +175,7 @@ export function CreatorSearch({
               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none
             "
             type="button"
+            aria-label="Search for creator"
           >
             Search
           </button>
@@ -176,6 +185,8 @@ export function CreatorSearch({
       {/* Error Message */}
       {showError && error && (
         <div
+          id={errorId}
+          role="alert"
           className={`
             absolute top-full mt-2 left-0 right-0
             flex items-center gap-2 px-4 py-3
@@ -184,7 +195,7 @@ export function CreatorSearch({
             animate-in fade-in slide-in-from-top-2 duration-200
           `}
         >
-          <AlertCircle className="w-4 h-4 shrink-0" />
+          <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </div>
       )}
