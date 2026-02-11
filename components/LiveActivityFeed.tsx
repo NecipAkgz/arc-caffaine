@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Coffee } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface Activity {
   id: string;
@@ -27,8 +28,11 @@ const MOCK_ACTIVITIES: Omit<Activity, "id">[] = [
  */
 export function LiveActivityFeed() {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
+    if (!isDesktop) return;
+
     let counter = 0;
 
     const addActivity = () => {
@@ -59,7 +63,7 @@ export function LiveActivityFeed() {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, []);
+  }, [isDesktop]);
 
   return (
     <div

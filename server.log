@@ -1,0 +1,14 @@
+
+> arc-caffaine@0.1.0 dev
+> next dev
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.0.2:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.1s
+ ○ Compiling / ...
+ GET / 200 in 358ms (compile: 265ms, render: 94ms)
+ GET / 200 in 416ms (compile: 240ms, render: 176ms)
