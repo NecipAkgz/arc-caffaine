@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
+import { useState, useRef, useEffect, KeyboardEvent, useId } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, X, AlertCircle } from "lucide-react";
 import { useCreatorSearch } from "@/hooks/useCreatorSearch";
@@ -33,6 +33,7 @@ export function CreatorSearch({
   const [query, setQuery] = useState("");
   const [showError, setShowError] = useState(false);
   const { searchCreator, loading, error, clearSearch } = useCreatorSearch();
+  const errorId = useId();
 
   // Handle search
   const handleSearch = async () => {
@@ -84,7 +85,7 @@ export function CreatorSearch({
   const isHero = variant === "hero";
 
   return (
-    <div className={`relative ${isHero ? "w-full max-w-lg" : "w-64"}`}>
+    <div role="search" className={`relative ${isHero ? "w-full max-w-lg" : "w-64"}`}>
       {/* Search Input Container */}
       <div
         className={`
@@ -125,6 +126,9 @@ export function CreatorSearch({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={loading}
+          aria-label="Search creators"
+          aria-invalid={showError && error ? "true" : "false"}
+          aria-describedby={showError && error ? errorId : undefined}
           className={`
             flex-1 bg-transparent border-none outline-none
             text-foreground placeholder:text-muted-foreground/60
@@ -176,6 +180,8 @@ export function CreatorSearch({
       {/* Error Message */}
       {showError && error && (
         <div
+          id={errorId}
+          role="alert"
           className={`
             absolute top-full mt-2 left-0 right-0
             flex items-center gap-2 px-4 py-3
