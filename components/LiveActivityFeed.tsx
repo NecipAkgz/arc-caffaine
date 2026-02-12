@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Coffee } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface Activity {
   id: string;
@@ -24,8 +25,18 @@ const MOCK_ACTIVITIES: Omit<Activity, "id">[] = [
  *
  * Displays toast-style notifications of recent support activity.
  * Auto-cycles through mock data with smooth GSAP animations.
+ *
+ * Optimized to only render on desktop (min-width: 768px).
  */
 export function LiveActivityFeed() {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (!isDesktop) return null;
+
+  return <LiveActivityFeedContent />;
+}
+
+function LiveActivityFeedContent() {
   const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {

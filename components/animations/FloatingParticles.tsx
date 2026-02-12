@@ -92,7 +92,6 @@ export function FloatingParticles() {
     const animate = () => {
       // Pause animation when not visible
       if (!isVisible) {
-        animationFrameRef.current = requestAnimationFrame(animate);
         return;
       }
 
