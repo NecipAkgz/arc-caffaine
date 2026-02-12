@@ -125,6 +125,7 @@ export function CreatorSearch({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={loading}
+          aria-label="Search creators"
           className={`
             flex-1 bg-transparent border-none outline-none
             text-foreground placeholder:text-muted-foreground/60

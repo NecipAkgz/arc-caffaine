@@ -309,12 +309,14 @@ export function HeroSection() {
                         onChange={(e) => setUsername(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/30 font-medium text-sm"
                         required
+                        aria-label="Username"
                       />
                       <textarea
                         placeholder="Short bio..."
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary focus:border-primary/50 outline-none transition-all resize-none h-24 text-sm"
+                        aria-label="Bio"
                       />
                     </div>
 
@@ -345,20 +347,25 @@ export function HeroSection() {
       <FadeIn
         delay={1}
         duration={1.2}
-        className="hidden md:flex absolute bottom-1 left-1/2 -translate-x-1/2 flex-col items-center gap-4 cursor-pointer group z-20"
-        onClick={() =>
-          window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
-        }
+        className="hidden md:flex absolute bottom-1 left-1/2 -translate-x-1/2 z-20"
       >
-        <div className="relative w-6 h-10 rounded-full border-2 border-white/10 flex justify-center p-2 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-          <div className="w-1 h-1.5 bg-primary rounded-full animate-bounce" />
-        </div>
-        <div className="flex flex-col items-center gap-1">
-          <span className="text-[12px] tracking-[0.3em] font-bold uppercase text-muted-foreground/40 group-hover:text-primary transition-colors">
-            Explore
-          </span>
-          <div className="w-px h-6 bg-linear-to-b from-primary/50 to-transparent group-hover:h-8 transition-all duration-500" />
-        </div>
+        <button
+          onClick={() =>
+            window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
+          }
+          className="flex flex-col items-center gap-4 cursor-pointer group bg-transparent border-none p-0 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-xl"
+          aria-label="Scroll to content"
+        >
+          <div className="relative w-6 h-10 rounded-full border-2 border-white/10 flex justify-center p-2 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+            <div className="w-1 h-1.5 bg-primary rounded-full animate-bounce" />
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[12px] tracking-[0.3em] font-bold uppercase text-muted-foreground/40 group-hover:text-primary transition-colors">
+              Explore
+            </span>
+            <div className="w-px h-6 bg-linear-to-b from-primary/50 to-transparent group-hover:h-8 transition-all duration-500" />
+          </div>
+        </button>
       </FadeIn>
     </section>
   );
