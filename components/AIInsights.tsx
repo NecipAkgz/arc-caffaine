@@ -114,6 +114,7 @@ export function AIInsights({ userAddress, memoData }: AIInsightsProps) {
           disabled={loading}
           className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground disabled:opacity-50 cursor-pointer"
           title="Generate Insights"
+          aria-label="Generate Insights"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

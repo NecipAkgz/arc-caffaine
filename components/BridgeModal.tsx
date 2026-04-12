@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import { useBridgeKit } from "@/hooks/useBridgeKit";
 import { BridgeForm } from "./bridge/BridgeForm";
@@ -65,6 +65,12 @@ export default function BridgeModal({
     };
   }, [isOpen]);
 
+  const handleClose = useCallback(() => {
+    if (status === "bridging") return; // Prevent closing while bridging
+    reset();
+    onClose();
+  }, [status, reset, onClose]);
+
   // Handle Escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -77,15 +83,9 @@ export default function BridgeModal({
       document.addEventListener("keydown", handleEscape);
       return () => document.removeEventListener("keydown", handleEscape);
     }
-  }, [isOpen, status]);
+  }, [isOpen, status, handleClose]);
 
   if (!isOpen) return null;
-
-  const handleClose = () => {
-    if (status === "bridging") return; // Prevent closing while bridging
-    reset();
-    onClose();
-  };
 
   const handleBridge = async (
     bridgeAmount: string,
