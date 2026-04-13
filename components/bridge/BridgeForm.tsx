@@ -75,6 +75,13 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
   const [showChainDropdown, setShowChainDropdown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
 
+  // perf(BridgeForm): Memoize the selected chain data lookup
+  // This prevents 3x O(N) array lookups (`otherChains.find`) on every render
+  const selectedChainData = useMemo(
+    () => otherChains.find((c) => c.id === selectedOtherChain),
+    [otherChains, selectedOtherChain]
+  );
+
   // Determine from/to chains based on direction
   const fromChainId =
     direction === "toArc" ? selectedOtherChain : ARC_TESTNET_ID;
@@ -206,16 +213,14 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
             : "border-white/10 hover:border-white/20"
         )}
       >
-        {otherChains.find((c) => c.id === selectedOtherChain) ? (
+        {selectedChainData ? (
           <>
             <ChainIcon
-              name={
-                otherChains.find((c) => c.id === selectedOtherChain)!.iconName
-              }
+              name={selectedChainData.iconName}
               size={24}
             />
             <span className="font-medium text-sm text-white truncate flex-1 text-left">
-              {otherChains.find((c) => c.id === selectedOtherChain)!.name}
+              {selectedChainData.name}
             </span>
           </>
         ) : (
