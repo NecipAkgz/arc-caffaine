@@ -83,6 +83,19 @@ export default function Dashboard() {
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [telegramConnected, setTelegramConnected] = useState(false);
 
+  // Memoize analytics calculations to prevent unnecessary re-runs on every render
+  const memoAnalytics = useMemo(() => {
+    return {
+      uniqueSupporters: getUniqueSupporterCount(memos),
+      averageDonation: getAverageDonation(memos),
+      topSupporters: getTopSupporters(memos, 1),
+      supportersOverTime: getSupportersOverTime(memos),
+      totalEarnings: getTotalEarnings(memos),
+    };
+  }, [memos]);
+
+  const topSupporter = memoAnalytics.topSupporters[0];
+
   useEffect(() => {
     let isMounted = true;
 
@@ -404,7 +417,7 @@ export default function Dashboard() {
                   <span className="text-sm font-medium">Unique Supporters</span>
                 </div>
                 <CountUp
-                  end={getUniqueSupporterCount(memos)}
+                  end={memoAnalytics.uniqueSupporters}
                   decimals={0}
                   duration={2}
                   className="text-3xl font-bold"
@@ -418,7 +431,7 @@ export default function Dashboard() {
                   <span className="text-sm font-medium">Avg. Donation</span>
                 </div>
                 <CountUp
-                  end={getAverageDonation(memos)}
+                  end={memoAnalytics.averageDonation}
                   decimals={2}
                   duration={2}
                   className="text-3xl font-bold"
@@ -432,21 +445,21 @@ export default function Dashboard() {
                   <Trophy className="w-4 h-4" />
                   <span className="text-sm font-medium">Top Supporter</span>
                 </div>
-                {getTopSupporters(memos, 1)[0] ? (
+                {topSupporter ? (
                   <div className="flex items-center gap-2">
                     <Avatar
                       address={
-                        getTopSupporters(memos, 1)[0].address as `0x${string}`
+                        topSupporter.address as `0x${string}`
                       }
                       size="sm"
                     />
                     <div>
                       <p className="font-bold text-lg">
-                        {getTopSupporters(memos, 1)[0].name?.trim() ||
-                          `${getTopSupporters(memos, 1)[0].address.slice(0, 6)}...`}
+                        {topSupporter.name?.trim() ||
+                          `${topSupporter.address.slice(0, 6)}...`}
                       </p>
                       <p className="text-xs text-green-500">
-                        {getTopSupporters(memos, 1)[0].totalAmount.toFixed(2)}{" "}
+                        {topSupporter.totalAmount.toFixed(2)}{" "}
                         USDC
                       </p>
                     </div>
@@ -463,7 +476,7 @@ export default function Dashboard() {
                 Supporter Growth
               </h3>
               <div className="h-[300px]">
-                <SupporterChart data={getSupportersOverTime(memos)} />
+                <SupporterChart data={memoAnalytics.supportersOverTime} />
               </div>
             </div>
 
@@ -472,16 +485,16 @@ export default function Dashboard() {
               userAddress={address || ""}
               memoData={{
                 totalDonations: memos.length,
-                uniqueSupporters: getUniqueSupporterCount(memos),
-                averageDonation: getAverageDonation(memos),
-                totalEarnings: getTotalEarnings(memos),
-                topSupporter: getTopSupporters(memos, 1)[0]
+                uniqueSupporters: memoAnalytics.uniqueSupporters,
+                averageDonation: memoAnalytics.averageDonation,
+                totalEarnings: memoAnalytics.totalEarnings,
+                topSupporter: topSupporter
                   ? {
-                      name: getTopSupporters(memos, 1)[0].name || "Anonymous",
-                      amount: getTopSupporters(memos, 1)[0].totalAmount,
+                      name: topSupporter.name || "Anonymous",
+                      amount: topSupporter.totalAmount,
                     }
                   : undefined,
-                recentActivity: getSupportersOverTime(memos)
+                recentActivity: memoAnalytics.supportersOverTime
                   .slice(-7)
                   .map((d) => ({
                     date: d.date,
