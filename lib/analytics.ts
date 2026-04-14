@@ -12,7 +12,12 @@ import { Memo } from "./types";
  * @returns Number of unique wallet addresses that have donated.
  */
 export function getUniqueSupporterCount(memos: Memo[]): number {
-  const uniqueAddresses = new Set(memos.map((memo) => memo.from.toLowerCase()));
+  // Optimization: standard indexed `for` loop significantly outperforms Array.prototype.map()
+  // for populating a `Set` from large arrays in Bun environments.
+  const uniqueAddresses = new Set<string>();
+  for (let i = 0; i < memos.length; i++) {
+    uniqueAddresses.add(memos[i].from.toLowerCase());
+  }
   return uniqueAddresses.size;
 }
 
@@ -23,10 +28,11 @@ export function getUniqueSupporterCount(memos: Memo[]): number {
  */
 export function getAverageDonation(memos: Memo[]): number {
   if (memos.length === 0) return 0;
-  const total = memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
+  let total = 0;
+  // Optimization: standard indexed `for` loop is faster than reduce
+  for (let i = 0; i < memos.length; i++) {
+    total += parseFloat(formatEther(memos[i].amount));
+  }
   return total / memos.length;
 }
 
@@ -45,7 +51,9 @@ export function getTopSupporters(
     { totalAmount: number; count: number; name?: string }
   >();
 
-  for (const memo of memos) {
+  // Optimization: standard indexed `for` loop is faster than for...of
+  for (let i = 0; i < memos.length; i++) {
+    const memo = memos[i];
     const address = memo.from.toLowerCase();
     const amount = parseFloat(formatEther(memo.amount));
     const existing = supporterMap.get(address) || { totalAmount: 0, count: 0 };
@@ -81,7 +89,9 @@ export function getSupportersOverTime(
   const seenAddresses = new Set<string>();
   const dateMap = new Map<string, number>();
 
-  for (const memo of sorted) {
+  // Optimization: standard indexed `for` loop is faster than for...of
+  for (let i = 0; i < sorted.length; i++) {
+    const memo = sorted[i];
     const date = new Date(Number(memo.timestamp) * 1000)
       .toISOString()
       .split("T")[0];
@@ -101,8 +111,10 @@ export function getSupportersOverTime(
  * @returns Total earnings in USDC.
  */
 export function getTotalEarnings(memos: Memo[]): number {
-  return memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
+  let sum = 0;
+  // Optimization: standard indexed `for` loop is faster than reduce
+  for (let i = 0; i < memos.length; i++) {
+    sum += parseFloat(formatEther(memos[i].amount));
+  }
+  return sum;
 }
