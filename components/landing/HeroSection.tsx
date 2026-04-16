@@ -230,6 +230,7 @@ export function HeroSection() {
                           disabled={refreshing}
                           className="p-1.5 hover:bg-white/5 rounded-lg transition text-muted-foreground hover:text-foreground disabled:opacity-50 cursor-pointer"
                           title="Refresh"
+                          aria-label="Refresh creators list"
                         >
                           <RefreshCw
                             className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`}
