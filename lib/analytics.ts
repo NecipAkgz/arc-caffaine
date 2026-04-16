@@ -12,7 +12,12 @@ import { Memo } from "./types";
  * @returns Number of unique wallet addresses that have donated.
  */
 export function getUniqueSupporterCount(memos: Memo[]): number {
-  const uniqueAddresses = new Set(memos.map((memo) => memo.from.toLowerCase()));
+  // Using a standard for loop instead of map to avoid intermediate array
+  // allocation, which is significantly faster for populating Sets in this environment.
+  const uniqueAddresses = new Set<string>();
+  for (let i = 0; i < memos.length; i++) {
+    uniqueAddresses.add(memos[i].from.toLowerCase());
+  }
   return uniqueAddresses.size;
 }
 
