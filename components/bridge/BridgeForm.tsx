@@ -342,6 +342,7 @@ export function BridgeForm({ defaultAmount, onBridge }: BridgeFormProps) {
             onClick={handleSwitch}
             className="bg-[#09090b] p-2.5 rounded-full border border-white/10 shadow-lg hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 cursor-pointer"
             aria-label="Switch direction"
+            title="Switch direction"
           >
             <ArrowUpDown
               className={cn(

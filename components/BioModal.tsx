@@ -56,6 +56,7 @@ export default function BioModal({
           onClick={onClose}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition"
           aria-label="Close modal"
+          title="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
