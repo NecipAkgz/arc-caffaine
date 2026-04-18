@@ -145,6 +145,7 @@ export function CreatorSearch({
             className="shrink-0 p-1 rounded-full hover:bg-border/50 transition-colors"
             type="button"
             aria-label="Clear"
+            title="Clear"
           >
             <X
               className={`text-muted-foreground ${

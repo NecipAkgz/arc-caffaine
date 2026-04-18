@@ -98,6 +98,7 @@ export function Navbar() {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors text-muted-foreground hover:text-foreground"
                 aria-label="Menu"
+                title="Menu"
               >
                 {isMobileMenuOpen ? (
                   <X className="w-5 h-5" />
