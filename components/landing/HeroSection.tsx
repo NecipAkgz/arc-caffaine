@@ -9,12 +9,11 @@ import { useAccount } from "wagmi";
 import { useArcCaffeine } from "@/hooks/useArcCaffeine";
 import { useRegisterForm } from "@/hooks/useRegisterForm";
 import { useState, useEffect, useCallback } from "react";
-import { getRandomCreators } from "@/lib/getCreators";
+import { getFallbackCreators, getRandomCreators } from "@/lib/getCreators";
 
 export function HeroSection() {
-  const { isConnected, address } = useAccount();
-  const { isRegistered, username, checkingRegistration, checkedAddress } =
-    useArcCaffeine();
+  const { isConnected } = useAccount();
+  const { isRegistered, username, checkingRegistration } = useArcCaffeine();
   const {
     username: newUsername,
     setUsername,
@@ -29,6 +28,7 @@ export function HeroSection() {
   const [creators, setCreators] = useState<string[]>([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showFallbackHint, setShowFallbackHint] = useState(false);
 
   const fetchCreators = useCallback(
     async (isRefresh = false) => {
@@ -36,12 +36,16 @@ export function HeroSection() {
       else setCreatorsLoading(true);
 
       try {
-        // Server-side cache handles refresh - just fetch fresh data
-        const randomCreators = await getRandomCreators(4);
-        // Filter out current user from the list
-        setCreators(randomCreators.filter((c) => c !== username));
+        const { creators: nextCreators, usedFallback } = await getRandomCreators(
+          4,
+          username ? [username] : [],
+        );
+        setCreators(nextCreators);
+        setShowFallbackHint(usedFallback);
       } catch (error) {
         console.error("Failed to fetch creators:", error);
+        setCreators(getFallbackCreators(4, username ? [username] : []));
+        setShowFallbackHint(true);
       } finally {
         setCreatorsLoading(false);
         setRefreshing(false);
@@ -225,70 +229,80 @@ export function HeroSection() {
                         <h3 className="text-sm font-medium text-muted-foreground">
                           Discover Creators
                         </h3>
-                        <button
-                          onClick={() => fetchCreators(true)}
-                          disabled={refreshing}
-                          className="p-1.5 hover:bg-white/5 rounded-lg transition text-muted-foreground hover:text-foreground disabled:opacity-50 cursor-pointer"
-                          title="Refresh"
-                          aria-label="Refresh creators list"
-                        >
-                          <RefreshCw
-                            className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`}
-                          />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {showFallbackHint && !creatorsLoading && (
+                            <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300/90">
+                              Community Picks
+                            </span>
+                          )}
+                          <button
+                            onClick={() => fetchCreators(true)}
+                            disabled={refreshing}
+                            className="p-1.5 hover:bg-white/5 rounded-lg transition text-muted-foreground hover:text-foreground disabled:opacity-50 cursor-pointer"
+                            title="Refresh"
+                            aria-label="Refresh creators list"
+                          >
+                            <RefreshCw
+                              className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`}
+                            />
+                          </button>
+                        </div>
                       </div>
 
                       {creatorsLoading ? (
                         <div className="py-8 flex items-center justify-center">
                           <Loader2 className="w-6 h-6 animate-spin text-primary/60" />
                         </div>
-                      ) : creators.length === 0 ? (
-                        <div className="py-8 text-center bg-white/2 rounded-2xl border border-white/5">
-                          <p className="text-sm text-muted-foreground">
-                            No other creators yet
-                          </p>
-                        </div>
                       ) : (
-                        <div className="grid gap-2">
-                          {creators.slice(0, 4).map((creatorName, index) => {
-                            // Generate a consistent pseudo-random color based on name
-                            const colors = [
-                              "from-blue-500/20 to-indigo-500/10 text-blue-400",
-                              "from-purple-500/20 to-pink-500/10 text-purple-400",
-                              "from-amber-500/20 to-orange-500/10 text-amber-400",
-                              "from-emerald-500/20 to-teal-500/10 text-emerald-400",
-                            ];
-                            const colorClass =
-                              colors[creatorName.length % colors.length];
+                        <div className="space-y-3">
+                          {showFallbackHint && (
+                            <p className="text-xs text-muted-foreground/80">
+                              Fresh on-chain results are still warming up. These
+                              picks keep discovery alive in the meantime.
+                            </p>
+                          )}
 
-                            return (
-                              <Link
-                                key={creatorName}
-                                href={`/${creatorName}`}
-                                className="group/item flex items-center gap-3 p-3 rounded-2xl bg-white/3 border border-white/5 hover:bg-white/8 hover:border-white/12 transition-all duration-300 transform hover:-translate-y-0.5 animate-fade-in-up"
-                                style={{ animationDelay: `${index * 100}ms` }}
-                              >
-                                <div
-                                  className={`w-10 h-10 rounded-xl bg-linear-to-br ${colorClass.split(" ").slice(0, 2).join(" ")} flex items-center justify-center shrink-0 shadow-lg group-hover/item:scale-110 transition-transform duration-300`}
+                          <div className="grid gap-2">
+                            {creators.slice(0, 4).map((creatorName, index) => {
+                              // Generate a consistent pseudo-random color based on name
+                              const colors = [
+                                "from-blue-500/20 to-indigo-500/10 text-blue-400",
+                                "from-purple-500/20 to-pink-500/10 text-purple-400",
+                                "from-amber-500/20 to-orange-500/10 text-amber-400",
+                                "from-emerald-500/20 to-teal-500/10 text-emerald-400",
+                              ];
+                              const colorClass =
+                                colors[creatorName.length % colors.length];
+
+                              return (
+                                <Link
+                                  key={creatorName}
+                                  href={`/${creatorName}`}
+                                  className="group/item flex items-center gap-3 p-3 rounded-2xl bg-white/3 border border-white/5 hover:bg-white/8 hover:border-white/12 transition-all duration-300 transform hover:-translate-y-0.5 animate-fade-in-up"
+                                  style={{ animationDelay: `${index * 100}ms` }}
                                 >
-                                  <Coffee
-                                    className={`w-4.5 h-4.5 ${colorClass.split(" ").pop()}`}
-                                  />
-                                </div>
-                                <div className="flex-1 overflow-hidden text-left">
-                                  <p className="font-semibold text-sm text-foreground/90 group-hover/item:text-primary transition-colors truncate">
-                                    @{creatorName}
-                                  </p>
-                                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold opacity-60">
-                                    View Profile
-                                  </p>
-                                </div>
-                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all duration-300 -translate-x-2 group-hover/item:translate-x-0">
-                                  <ArrowRight className="w-4 h-4 text-primary" />
-                                </div>
-                              </Link>
-                            );
-                          })}
+                                  <div
+                                    className={`w-10 h-10 rounded-xl bg-linear-to-br ${colorClass.split(" ").slice(0, 2).join(" ")} flex items-center justify-center shrink-0 shadow-lg group-hover/item:scale-110 transition-transform duration-300`}
+                                  >
+                                    <Coffee
+                                      className={`w-4.5 h-4.5 ${colorClass.split(" ").pop()}`}
+                                    />
+                                  </div>
+                                  <div className="flex-1 overflow-hidden text-left">
+                                    <p className="font-semibold text-sm text-foreground/90 group-hover/item:text-primary transition-colors truncate">
+                                      @{creatorName}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold opacity-60">
+                                      View Profile
+                                    </p>
+                                  </div>
+                                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all duration-300 -translate-x-2 group-hover/item:translate-x-0">
+                                    <ArrowRight className="w-4 h-4 text-primary" />
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                     </div>

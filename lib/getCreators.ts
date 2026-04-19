@@ -4,6 +4,90 @@ interface CreatorsResponse {
   timestamp: number;
 }
 
+export interface DiscoverCreatorsResult {
+  creators: string[];
+  usedFallback: boolean;
+}
+
+const FALLBACK_CREATORS = [
+  "Neco",
+  "Croky",
+  "Jane",
+  "emma",
+  "john",
+  "ArcMuse",
+  "PixelPilot",
+  "tony",
+];
+
+function normalizeUsername(username: string) {
+  return username.trim().toLowerCase();
+}
+
+function shuffleCreators(creators: string[]) {
+  const shuffled = [...creators];
+
+  // Fisher-Yates shuffle
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled;
+}
+
+function buildDiscoverCreators(
+  primaryCreators: string[],
+  count: number,
+  exclude: string[],
+): DiscoverCreatorsResult {
+  const excluded = new Set(exclude.map(normalizeUsername));
+  const seen = new Set<string>();
+  const creators: string[] = [];
+
+  for (const creator of primaryCreators) {
+    const normalized = normalizeUsername(creator);
+
+    if (!normalized || excluded.has(normalized) || seen.has(normalized)) {
+      continue;
+    }
+
+    seen.add(normalized);
+    creators.push(creator);
+
+    if (creators.length === count) {
+      return { creators, usedFallback: false };
+    }
+  }
+
+  let usedFallback = false;
+
+  for (const creator of FALLBACK_CREATORS) {
+    const normalized = normalizeUsername(creator);
+
+    if (!normalized || excluded.has(normalized) || seen.has(normalized)) {
+      continue;
+    }
+
+    seen.add(normalized);
+    creators.push(creator);
+    usedFallback = true;
+
+    if (creators.length === count) {
+      break;
+    }
+  }
+
+  return { creators, usedFallback };
+}
+
+export function getFallbackCreators(
+  count: number = 3,
+  exclude: string[] = [],
+): string[] {
+  return buildDiscoverCreators([], count, exclude).creators;
+}
+
 /**
  * Fetches all registered creators from server-side cached API.
  * Server refreshes blockchain data every hour.
@@ -21,22 +105,21 @@ export async function getAllCreators(): Promise<string[]> {
 }
 
 /**
- * Returns N random creators from all registered creators.
- * Shuffles the array and picks the first N.
- * @param count - Number of random creators to return
+ * Returns N discoverable creators.
+ * Prefers on-chain creators, then fills remaining slots with curated fallbacks
+ * so the landing section never renders empty.
+ * @param count - Number of creators to return
  */
-export async function getRandomCreators(count: number = 3): Promise<string[]> {
-  const allCreators = await getAllCreators();
+export async function getRandomCreators(
+  count: number = 3,
+  exclude: string[] = [],
+): Promise<DiscoverCreatorsResult> {
+  try {
+    const allCreators = await getAllCreators();
+    const shuffledCreators = shuffleCreators(allCreators);
 
-  if (allCreators.length === 0) return [];
-  if (allCreators.length <= count) return allCreators;
-
-  // Fisher-Yates shuffle
-  const shuffled = [...allCreators];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    return buildDiscoverCreators(shuffledCreators, count, exclude);
+  } catch {
+    return buildDiscoverCreators([], count, exclude);
   }
-
-  return shuffled.slice(0, count);
 }
