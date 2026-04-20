@@ -28,11 +28,13 @@ export function getUniqueSupporterCount(memos: Memo[]): number {
  */
 export function getAverageDonation(memos: Memo[]): number {
   if (memos.length === 0) return 0;
-  const total = memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
-  return total / memos.length;
+  let totalWei = 0n;
+  // Using an indexed for loop and native bigint addition avoids intermediate string/float
+  // allocations inside the loop, optimizing performance for large arrays.
+  for (let i = 0; i < memos.length; i++) {
+    totalWei += memos[i].amount;
+  }
+  return parseFloat(formatEther(totalWei)) / memos.length;
 }
 
 /**
@@ -47,22 +49,28 @@ export function getTopSupporters(
 ): { address: string; totalAmount: number; count: number; name?: string }[] {
   const supporterMap = new Map<
     string,
-    { totalAmount: number; count: number; name?: string }
+    { totalAmountWei: bigint; count: number; name?: string }
   >();
 
-  for (const memo of memos) {
+  // Use an indexed loop and native bigint addition to improve map population performance
+  for (let i = 0; i < memos.length; i++) {
+    const memo = memos[i];
     const address = memo.from.toLowerCase();
-    const amount = parseFloat(formatEther(memo.amount));
-    const existing = supporterMap.get(address) || { totalAmount: 0, count: 0 };
+    const existing = supporterMap.get(address) || { totalAmountWei: 0n, count: 0 };
     supporterMap.set(address, {
-      totalAmount: existing.totalAmount + amount,
+      totalAmountWei: existing.totalAmountWei + memo.amount,
       count: existing.count + 1,
       name: memo.name || existing.name, // Keep the last known name
     });
   }
 
   return Array.from(supporterMap.entries())
-    .map(([address, data]) => ({ address, ...data }))
+    .map(([address, data]) => ({
+      address,
+      totalAmount: parseFloat(formatEther(data.totalAmountWei)),
+      count: data.count,
+      name: data.name,
+    }))
     .sort((a, b) => b.totalAmount - a.totalAmount)
     .slice(0, limit);
 }
@@ -106,8 +114,10 @@ export function getSupportersOverTime(
  * @returns Total earnings in USDC.
  */
 export function getTotalEarnings(memos: Memo[]): number {
-  return memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
+  let totalWei = 0n;
+  // Accumulate native bigints to avoid O(N) formatEther allocations
+  for (let i = 0; i < memos.length; i++) {
+    totalWei += memos[i].amount;
+  }
+  return parseFloat(formatEther(totalWei));
 }
