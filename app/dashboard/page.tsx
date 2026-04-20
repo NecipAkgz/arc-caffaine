@@ -264,6 +264,7 @@ export default function Dashboard() {
                       : "hover:bg-background"
                   }`}
                   title="Copy Link"
+                  aria-label="Copy profile link"
                 >
                   {copied ? (
                     <>
@@ -278,6 +279,7 @@ export default function Dashboard() {
                   onClick={() => setIsQRModalOpen(true)}
                   className="p-2 hover:bg-background rounded transition cursor-pointer shrink-0"
                   title="Show QR Code"
+                  aria-label="Show QR Code"
                 >
                   <QrCode className="w-4 h-4" />
                 </button>
@@ -381,6 +383,7 @@ export default function Dashboard() {
                 onClick={() => setIsBioModalOpen(true)}
                 className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground"
                 title="Edit Bio"
+                aria-label="Edit Bio"
               >
                 <Edit className="w-4 h-4" />
               </button>
