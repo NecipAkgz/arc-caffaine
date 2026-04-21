@@ -422,6 +422,7 @@ export default function PublicProfile() {
                         }}
                         className="absolute bottom-3 right-3 p-2 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary transition-all disabled:opacity-50 cursor-pointer"
                         title="Generate AI message"
+                        aria-label="Generate AI message"
                       >
                         {generatingMessage ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
