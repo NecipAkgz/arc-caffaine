@@ -381,6 +381,7 @@ export default function Dashboard() {
                 onClick={() => setIsBioModalOpen(true)}
                 className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground"
                 title="Edit Bio"
+                aria-label="Edit Profile Bio"
               >
                 <Edit className="w-4 h-4" />
               </button>
