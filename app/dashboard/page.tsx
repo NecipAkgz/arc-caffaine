@@ -264,6 +264,7 @@ export default function Dashboard() {
                       : "hover:bg-background"
                   }`}
                   title="Copy Link"
+                  aria-label="Copy Link"
                 >
                   {copied ? (
                     <>
@@ -278,6 +279,7 @@ export default function Dashboard() {
                   onClick={() => setIsQRModalOpen(true)}
                   className="p-2 hover:bg-background rounded transition cursor-pointer shrink-0"
                   title="Show QR Code"
+                  aria-label="Show QR Code"
                 >
                   <QrCode className="w-4 h-4" />
                 </button>
@@ -291,6 +293,7 @@ export default function Dashboard() {
                   rel="noopener noreferrer"
                   className="p-2 hover:bg-background rounded transition cursor-pointer text-blue-400 hover:text-blue-500 shrink-0"
                   title="Share on Twitter"
+                  aria-label="Share on Twitter"
                 >
                   <Twitter className="w-4 h-4" />
                 </a>
@@ -298,6 +301,8 @@ export default function Dashboard() {
                   href={`/${username}`}
                   target="_blank"
                   className="p-2 hover:bg-background rounded transition shrink-0"
+                  title="View public profile"
+                  aria-label="View public profile"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </Link>
@@ -381,6 +386,7 @@ export default function Dashboard() {
                 onClick={() => setIsBioModalOpen(true)}
                 className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground"
                 title="Edit Bio"
+                aria-label="Edit Bio"
               >
                 <Edit className="w-4 h-4" />
               </button>
