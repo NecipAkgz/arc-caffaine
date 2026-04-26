@@ -28,11 +28,12 @@ export function getUniqueSupporterCount(memos: Memo[]): number {
  */
 export function getAverageDonation(memos: Memo[]): number {
   if (memos.length === 0) return 0;
-  const total = memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
+  // Summing as bigint natively first avoids O(N) string allocations and float conversions per item
+  const totalBigInt = memos.reduce(
+    (sum, memo) => sum + BigInt(memo.amount.toString()),
+    BigInt(0),
   );
-  return total / memos.length;
+  return parseFloat(formatEther(totalBigInt)) / memos.length;
 }
 
 /**
@@ -47,22 +48,28 @@ export function getTopSupporters(
 ): { address: string; totalAmount: number; count: number; name?: string }[] {
   const supporterMap = new Map<
     string,
-    { totalAmount: number; count: number; name?: string }
+    { totalAmountBigInt: bigint; count: number; name?: string }
   >();
 
   for (const memo of memos) {
     const address = memo.from.toLowerCase();
-    const amount = parseFloat(formatEther(memo.amount));
-    const existing = supporterMap.get(address) || { totalAmount: 0, count: 0 };
+    // Summing as bigint natively first avoids O(N) string allocations and float conversions per item
+    const amountBigInt = BigInt(memo.amount.toString());
+    const existing = supporterMap.get(address) || { totalAmountBigInt: BigInt(0), count: 0 };
     supporterMap.set(address, {
-      totalAmount: existing.totalAmount + amount,
+      totalAmountBigInt: existing.totalAmountBigInt + amountBigInt,
       count: existing.count + 1,
       name: memo.name || existing.name, // Keep the last known name
     });
   }
 
   return Array.from(supporterMap.entries())
-    .map(([address, data]) => ({ address, ...data }))
+    .map(([address, data]) => ({
+      address,
+      totalAmount: parseFloat(formatEther(data.totalAmountBigInt)),
+      count: data.count,
+      name: data.name,
+    }))
     .sort((a, b) => b.totalAmount - a.totalAmount)
     .slice(0, limit);
 }
@@ -106,8 +113,10 @@ export function getSupportersOverTime(
  * @returns Total earnings in USDC.
  */
 export function getTotalEarnings(memos: Memo[]): number {
-  return memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
+  // Summing as bigint natively first avoids O(N) string allocations and float conversions per item
+  const totalBigInt = memos.reduce(
+    (sum, memo) => sum + BigInt(memo.amount.toString()),
+    BigInt(0),
   );
+  return parseFloat(formatEther(totalBigInt));
 }
