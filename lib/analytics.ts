@@ -28,11 +28,16 @@ export function getUniqueSupporterCount(memos: Memo[]): number {
  */
 export function getAverageDonation(memos: Memo[]): number {
   if (memos.length === 0) return 0;
-  const total = memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
-  return total / memos.length;
+
+  // Summing native BigInt values in a loop is much faster than running
+  // formatEther (string allocation) and parseFloat on every iteration.
+  let totalWei = BigInt(0);
+  for (let i = 0; i < memos.length; i++) {
+    totalWei += BigInt(memos[i].amount.toString());
+  }
+
+  const totalUsdc = parseFloat(formatEther(totalWei));
+  return totalUsdc / memos.length;
 }
 
 /**
@@ -106,8 +111,14 @@ export function getSupportersOverTime(
  * @returns Total earnings in USDC.
  */
 export function getTotalEarnings(memos: Memo[]): number {
-  return memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
+  if (memos.length === 0) return 0;
+
+  // Summing native BigInt values in a loop avoids O(N) string formatting
+  // and parsing overhead from formatEther/parseFloat.
+  let totalWei = BigInt(0);
+  for (let i = 0; i < memos.length; i++) {
+    totalWei += BigInt(memos[i].amount.toString());
+  }
+
+  return parseFloat(formatEther(totalWei));
 }
