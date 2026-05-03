@@ -28,11 +28,15 @@ export function getUniqueSupporterCount(memos: Memo[]): number {
  */
 export function getAverageDonation(memos: Memo[]): number {
   if (memos.length === 0) return 0;
-  const total = memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
-  return total / memos.length;
+
+  // Sum bigint values natively before applying formatting utilities
+  // to avoid O(N) string and float allocations.
+  let totalWei = BigInt(0);
+  for (let i = 0; i < memos.length; i++) {
+    totalWei += BigInt(memos[i].amount.toString());
+  }
+
+  return parseFloat(formatEther(totalWei)) / memos.length;
 }
 
 /**
@@ -47,22 +51,36 @@ export function getTopSupporters(
 ): { address: string; totalAmount: number; count: number; name?: string }[] {
   const supporterMap = new Map<
     string,
-    { totalAmount: number; count: number; name?: string }
+    { totalWei: bigint; count: number; name?: string }
   >();
 
-  for (const memo of memos) {
+  // Use standard for loop and bigint summation to avoid O(N) string/float allocations
+  for (let i = 0; i < memos.length; i++) {
+    const memo = memos[i];
     const address = memo.from.toLowerCase();
-    const amount = parseFloat(formatEther(memo.amount));
-    const existing = supporterMap.get(address) || { totalAmount: 0, count: 0 };
-    supporterMap.set(address, {
-      totalAmount: existing.totalAmount + amount,
-      count: existing.count + 1,
-      name: memo.name || existing.name, // Keep the last known name
-    });
+    const amountWei = BigInt(memo.amount.toString());
+    const existing = supporterMap.get(address);
+
+    if (existing) {
+      existing.totalWei += amountWei;
+      existing.count += 1;
+      if (memo.name) existing.name = memo.name; // Keep the last known name
+    } else {
+      supporterMap.set(address, {
+        totalWei: amountWei,
+        count: 1,
+        name: memo.name,
+      });
+    }
   }
 
   return Array.from(supporterMap.entries())
-    .map(([address, data]) => ({ address, ...data }))
+    .map(([address, data]) => ({
+      address,
+      totalAmount: parseFloat(formatEther(data.totalWei)),
+      count: data.count,
+      name: data.name
+    }))
     .sort((a, b) => b.totalAmount - a.totalAmount)
     .slice(0, limit);
 }
@@ -106,8 +124,12 @@ export function getSupportersOverTime(
  * @returns Total earnings in USDC.
  */
 export function getTotalEarnings(memos: Memo[]): number {
-  return memos.reduce(
-    (sum, memo) => sum + parseFloat(formatEther(memo.amount)),
-    0,
-  );
+  // Sum bigint values natively before applying formatting utilities
+  // to avoid O(N) string and float allocations.
+  let totalWei = BigInt(0);
+  for (let i = 0; i < memos.length; i++) {
+    totalWei += BigInt(memos[i].amount.toString());
+  }
+
+  return parseFloat(formatEther(totalWei));
 }
