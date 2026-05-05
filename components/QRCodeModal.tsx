@@ -124,6 +124,7 @@ export default function QRCodeModal({
           <button
             onClick={onClose}
             className="p-2 hover:bg-background rounded-lg transition text-muted-foreground hover:text-foreground cursor-pointer"
+            title="Close modal"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />

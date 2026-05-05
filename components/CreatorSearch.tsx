@@ -144,6 +144,7 @@ export function CreatorSearch({
             }}
             className="shrink-0 p-1 rounded-full hover:bg-border/50 transition-colors"
             type="button"
+            title="Clear"
             aria-label="Clear"
           >
             <X

@@ -119,6 +119,7 @@ export default function BridgeModal({
             onClick={handleClose}
             disabled={status === "bridging"}
             className="p-2 hover:bg-white/5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-zinc-400 hover:text-white cursor-pointer"
+            title="Close modal"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
